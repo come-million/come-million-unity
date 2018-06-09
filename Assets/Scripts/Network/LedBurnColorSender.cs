@@ -16,7 +16,6 @@ public class LedBurnColorSender : MonoBehaviour {
     }
 
 	void Update () {
-        
         Color32[] colors = new Color32[transform.childCount];
         int i = 0;
         foreach (Transform child in transform) {

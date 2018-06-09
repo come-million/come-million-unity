@@ -50,4 +50,5 @@ public class TileBehaviour : MonoBehaviour {
 			child.GetComponent<Renderer>().material.color = new Color32(1, 234, 32, 128); // example
 		}
 	}
+    
 }
