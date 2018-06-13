@@ -23,6 +23,7 @@ public class LBClientSender : MonoBehaviour {
     // segments that we are working with.
     // the key to the dictionary is a 32bit number which is the union of the strip id and pixel address
     private Dictionary<uint, byte[]> m_allSegments = new Dictionary<uint, byte[]>();
+    public static LBClientSender Instance;
 
     public void SetData(ushort stripId, ushort pixelAddressInStrip, Color32[] colors)
     {
@@ -53,13 +54,17 @@ public class LBClientSender : MonoBehaviour {
         }
     }
 
+    void Awake() {
+        Instance = this;
+    }
+    
 	void Start () {
         m_lastFrameId = (uint)Random.Range(0, 10000);
         m_udpClient = new UdpClient(LBServerPort);
         m_targetIP = new IPEndPoint(IPAddress.Parse(LBServerIP), LBServerPort);
 	}
 	
-	void FixedUpdate () {
+	void Update () {
         m_lastFrameId++;
         foreach (byte[] segmentByteArray in m_allSegments.Values)
         {
