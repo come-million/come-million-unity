@@ -13,9 +13,12 @@
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			
 			#include "UnityCG.cginc"
 
+			float4 _Resolution;
+			sampler2D _MainTex;
+			float4 _MainTex_TexelSize;
+			
 			struct appdata
 			{
 				float4 vertex : POSITION;
@@ -35,18 +38,20 @@
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
+				o.uv *= _Resolution.zw * _MainTex_TexelSize.xy;
+				o.uv += _Resolution.xy * _MainTex_TexelSize.xy;
+				// o.uv.y = 1 - o.uv.y;
 				o.color = v.color;
 				return o;
 			}
-			
-			sampler2D _MainTex;
-			float4 _MainTex_TexelSize;
 
 			fixed4 frag (v2f i) : SV_Target
 			{
+				// return i.color;
 				// return float4(i.uv, 0, 1);
 				float4 col = tex2D(_MainTex, i.uv);
-				col *= 2 - pow(length(i.color), 2);
+				float r = 2 - pow(length(i.color), 2);
+				col = col * r + col * r;
 				return col;
 			}
 			ENDCG
