@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BlinkBehaviour : MonoBehaviour {
 
-	Color32 red = Color.red;	 
- 	Color32 green = Color.green;
+	public Color32 onColor = Color.white;	 
+ 	public Color32 offColor = Color.black;
 	
 	public static float freq = 3f; // blink every N_TILES / freq seconds
 	static int totalCount = 0;
@@ -32,7 +32,7 @@ public class BlinkBehaviour : MonoBehaviour {
 		if (renderer) {
 			// simple counter, tunrs on if time modulus #tri is my id:
 			int t = (int)(Time.time * freq);
-			renderer.material.color = (t % totalCount == myIndex) ? red : green;
+			renderer.material.color = (t % totalCount == myIndex) ? onColor : offColor;
 		}
 	}
     
