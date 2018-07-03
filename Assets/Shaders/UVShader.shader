@@ -52,7 +52,7 @@
 				float4 col = tex2D(_MainTex, i.uv);
 				float r = 2 - pow(length(i.color), 2);
 				col = col * r + col * r;
-				return col;
+				return col.grba;
 			}
 			ENDCG
 		}

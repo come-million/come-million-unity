@@ -18,17 +18,22 @@ public class TileGroup : MonoBehaviour
     {
         tiles = GetComponentsInChildren<Tile>();
 
+        if (rect.size == Vector2Int.zero)
+            return;
+
         rt = new RenderTexture(rect.width, rect.height, 0, RenderTextureFormat.ARGB32)
         {
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp,
         };
+        rt.Create();
 
         tex = new Texture2D(rect.width, rect.height, TextureFormat.ARGB32, false, false)
         {
             filterMode = FilterMode.Point,
             wrapMode = TextureWrapMode.Clamp,
         };
+        tex.Apply();
 
         tilesPixels = new List<Color32[]>(tiles.Length);
         for (int i = 0; i < tiles.Length; i++)
@@ -72,15 +77,18 @@ public class TileGroup : MonoBehaviour
             }
 
             RenderTexture.active = null;
-            // UnityEditor.EditorUtility.SetDirty(rt);
 
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(rt);
+            UnityEditor.SceneView.RepaintAll();
+#endif
             yield return w;
 
             ReadAndSend();
         }
     }
 
-    static void CopyRect(Color32[] src, Color32[] dst, RectInt r)
+    public static void CopyRect(Color32[] src, Color32[] dst, RectInt r)
     {
         int rows = r.height;
         int w = r.width;
@@ -108,8 +116,7 @@ public class TileGroup : MonoBehaviour
             CopyRect(colors, c, r1);
             // t.tex.SetPixels32(c);
             // t.tex.Apply();
-            LBClientSender.Instance.SetData(t.tileId, 0, c);
+            LBClientSender.Instance.SetData(t.tileId, 1, c);
         }
-
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class TransformToShader : MonoBehaviour {
 	
 	public string PropertyName;
+	public bool inverse = false;
 
 	// Use this for initialization
 	void Start () {
@@ -13,6 +14,6 @@ public class TransformToShader : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Shader.SetGlobalMatrix(PropertyName, transform.localToWorldMatrix);
+		Shader.SetGlobalMatrix(PropertyName, inverse ? transform.worldToLocalMatrix : transform.localToWorldMatrix);
 	}
 }
