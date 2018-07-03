@@ -20,7 +20,7 @@ public class TileGroup : MonoBehaviour
 
         if (rect.size == Vector2Int.zero)
         {
-            Debug.LogError("Invalid rect size");
+            Debug.LogWarning("Invalid rect size");
             return;
         }
 

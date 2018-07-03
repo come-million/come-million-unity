@@ -1,10 +1,10 @@
-﻿Shader "Unlit/UVDebug"
+﻿Shader "Unlit/DebugTriangle"
 {
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 		_Resolution ("Resolution", Vector) = (10, 5, 10, 5)
-		_Highlight ("Highlight", Range(0, 50)) = 0
+		// _Highlight ("Highlight", Range(0, 50)) = 0
 	}
 	SubShader
 	{
@@ -13,40 +13,39 @@
 		Pass
 		{
 			CGPROGRAM
+			#include "UnityCG.cginc"
+			#include "Common.cginc"
 			#pragma vertex vert
 			#pragma fragment frag
-			
-			#include "UnityCG.cginc"
 
-			struct appdata
-			{
-				float4 vertex : POSITION;
-				float4 color : COLOR;
-				float2 uv : TEXCOORD0;
-				float2 uv1 : TEXCOORD1;
-			};
+			float4 _Tint;
 
 			struct v2f
 			{
-				float2 uv : TEXCOORD0;
-				float2 uv1 : TEXCOORD1;
-				float4 color : COLOR;
-				float4 vertex : SV_POSITION;
+				TRI_COMMON
+				float2 pos : TEXCOORD2; 
 			};
 
-			v2f vert (appdata v)
-			{
+			v2f vert(appdata v) {
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
-				o.uv = v.uv;
-				o.uv1 = v.uv1;
-				o.color = v.color;
+				TRI_INITIALIZE(o);
+				o.pos = v.uv2;
 				return o;
 			}
+
+			// v2f vert (appdata v)
+			// {
+			// 	v2f o;
+			// 	o.vertex = UnityObjectToClipPos(v.vertex);
+			// 	o.uv = v.uv;
+			// 	o.uv1 = v.uv1;
+			// 	o.color = v.color;
+			// 	return o;
+			// }
 			
 			sampler2D _MainTex;
 			float4 _MainTex_TexelSize;
-			float4 _Resolution;
+			// float4 _Resolution;
 			int _Highlight;
 
 			fixed4 frag (v2f i) : SV_Target
@@ -57,7 +56,7 @@
 					return float4(1,0,1,1);
 				// return i.color;
 				// return float4(i.uv1, 0, 1);
-				return float4(i.uv, 0, 1);
+				return float4(i.uv, 0, 1).grba;
 			}
 			ENDCG
 		}
