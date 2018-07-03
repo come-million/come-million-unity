@@ -20,6 +20,8 @@ public class TileGridWizard : ScriptableWizard
     {
         var group = new GameObject("TileGroup", typeof(TileGroup));
 
+        float x = Mathf.Sqrt(1 + 0.5f * 0.5f) * 0.5f - 0.1f;
+
         for (int j = 0; j < Rows; j++)
         {
             for (int i = 0; i < Columns; i++)
@@ -30,14 +32,15 @@ public class TileGridWizard : ScriptableWizard
                 go.name = "Tile" + (1 + id);
                 var t = go.GetComponent<Tile>();
                 t.tileId = (ushort)id;
-                
+
                 t.rect.x += i * t.rect.width;
                 t.rect.y += j * t.rect.height;
 
                 t.transform.SetParent(group.transform);
-                t.transform.position = new Vector3(t.rect.x, 0, t.rect.y);
+                var b = t.GetComponent<MeshFilter>().sharedMesh.bounds;
+                t.transform.position = new Vector3(i * (b.size.x - x) + (j % 2 == 1 ? 0.55f : 0), 0, j * (b.size.z + 0.05f));
             }
         }
-		
+
     }
 }

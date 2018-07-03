@@ -71,7 +71,6 @@ float4 tri_pos(appdata v) {
 #define TRI_INITIALIZE(o) { \
     o.vertex = tri_pos(v); \
     o.uv = v.uv; \
-    o.uv += _Resolution.xy / _Resolution.zw; \
     o.bc = v.bc; \
     }
 

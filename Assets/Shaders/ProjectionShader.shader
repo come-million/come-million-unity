@@ -7,7 +7,7 @@
 	}
 	SubShader
 	{
-		// Cull Off
+		Cull Off
 		
 		Pass
 		{
@@ -17,8 +17,6 @@
 			
 			#include "UnityCG.cginc"
 			#include "Common.cginc"
-
-			
 			
 			float4 _Offset;
 			float4 _Tint;
@@ -57,20 +55,14 @@
 
 			fixed4 frag (v2f i) : SV_Target
 			{
-
-
+				// return i.pos;
 
 				if(i.pos.x < 0 || i.pos.x > 1)
 					discard;
 				if(i.pos.y < 0 || i.pos.y > 1)
 					discard;
 
-
-                // return i.pos;
-				// return tex2D(_ProjectionTex, i.uv).grba;
 				return (tex2D(_ProjectionTex, i.pos.xy) * _Tint ).grba;
-				// return tex2Dproj(_ProjectionTex, i.pos).grba;
-				// return tex2Dproj(_ProjectionTex, float4(i.uv.xy, 0, 1)).grba;
 			}
 			ENDCG
 		}

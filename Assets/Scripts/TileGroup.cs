@@ -19,7 +19,10 @@ public class TileGroup : MonoBehaviour
         tiles = GetComponentsInChildren<Tile>();
 
         if (rect.size == Vector2Int.zero)
+        {
+            Debug.LogError("Invalid rect size");
             return;
+        }
 
         rt = new RenderTexture(rect.width, rect.height, 0, RenderTextureFormat.ARGB32)
         {

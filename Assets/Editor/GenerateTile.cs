@@ -7,7 +7,7 @@ public class CreateTileWizard : ScriptableWizard
 {
     public MeshFilter meshFilter;
     public int Rows = 5;
-    public int Columns = 9;
+    public int Columns = 10;
 
     [MenuItem("Tools/Create Tile Wizard...")]
     static void CreateWizard()
