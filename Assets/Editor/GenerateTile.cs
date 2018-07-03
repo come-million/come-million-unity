@@ -87,6 +87,8 @@ public class TileGenerator
                 .SelectMany(uv => uv)
                 .ToArray();
 
+        m.uv2 = m.uv;
+        
         // m.normals = verts.Select(v => Vector3.up).ToArray();
 
         // var centers = Enumerable.Range(0, rows * cols).Select(i =>

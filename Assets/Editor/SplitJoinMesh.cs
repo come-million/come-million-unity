@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -20,6 +21,7 @@ public static class SplitJoinMesh
         var verts = mesh.vertices;
         var tris = mesh.triangles;
         var uvs = mesh.uv;
+        var uvs2 = mesh.uv2;
         var colors = mesh.colors;
 
         var l = tris.Length;
@@ -31,6 +33,7 @@ public static class SplitJoinMesh
             var m = new Mesh();
             m.vertices = tri.Select(t => verts[t]).ToArray();
             m.uv = tri.Select(t => uvs[t]).ToArray();
+            m.uv2 = tri.Select(t => uvs2[t]).ToArray();
             m.colors = tri.Select(t => colors[t]).ToArray();
             m.triangles = new int[] { 2, 1, 0 };
             m.RecalculateBounds();
@@ -46,6 +49,24 @@ public static class SplitJoinMesh
 
     }
 
+    [MenuItem("CONTEXT/MeshFilter/Sort children by name")]
+    static void CombineChildMeshesSorted(MenuCommand cmd)
+    {
+        MeshFilter mf = cmd.context as MeshFilter;
+        var mesh = mf.sharedMesh;
+        var meshFilters = mf.GetComponentsInChildren<MeshFilter>().Where(i => i != mf).ToArray();
+        var origUV = meshFilters.Select(m => m.sharedMesh.uv).ToArray();
+        Func<MeshFilter, int> key = m => int.Parse(m.gameObject.name.Substring(3));
+        Array.Sort(meshFilters, (a, b) => key(a).CompareTo(key(b)));
+        Array.ForEach(meshFilters, m => m.transform.parent = null);
+        Array.ForEach(meshFilters, m => m.transform.parent = mf.transform);
+
+        for (int i = 0; i < meshFilters.Length; i++)
+        {
+            meshFilters[i].sharedMesh.uv = origUV[i];
+        }
+    }
+
     [MenuItem("CONTEXT/MeshFilter/Combine child meshes")]
     static void CombineChildMeshes(MenuCommand cmd)
     {
@@ -58,6 +79,7 @@ public static class SplitJoinMesh
         for (int i = 0; i < meshFilters.Length; i++)
         {
             var c = meshFilters[i];
+            Debug.Log(c.gameObject.name);
             var m = c.GetComponent<MeshFilter>().sharedMesh;
             var t = c.GetComponent<Transform>();
             combine[i].mesh = m;
