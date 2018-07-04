@@ -40,7 +40,10 @@
 				o.uv = v.uv;
 				o.uv *= _Resolution.zw * _MainTex_TexelSize.xy;
 				o.uv += _Resolution.xy * _MainTex_TexelSize.xy;
-				// o.uv.y = 1 - o.uv.y;
+				#if SHADER_API_GLCORE
+				o.uv.y = 1 - o.uv.y;
+				o.uv.x += 0.5 * _MainTex_TexelSize.x;
+				#endif
 				o.color = v.color;
 				return o;
 			}
