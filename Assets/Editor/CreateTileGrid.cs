@@ -31,7 +31,8 @@ public class TileGridWizard : ScriptableWizard
                 int id = i + j * Rows;
                 go.name = "Tile" + (1 + id);
                 var t = go.GetComponent<Tile>();
-                t.tileId = (ushort)id;
+                t.stripId = (ushort)(id / 5);
+                t.pixelAddressInStrip = (ushort)(id % (t.rect.width * t.rect.height));
 
                 t.rect.x += i * t.rect.width;
                 t.rect.y += j * t.rect.height;

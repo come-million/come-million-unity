@@ -119,7 +119,7 @@ public class TileGroup : MonoBehaviour
             CopyRect(colors, c, r1);
             // t.tex.SetPixels32(c);
             // t.tex.Apply();
-            LBClientSender.Instance.SetData(t.tileId, 1, c);
+            LBClientSender.Instance.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
         }
     }
 }

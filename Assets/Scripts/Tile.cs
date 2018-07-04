@@ -6,7 +6,8 @@ using UnityEngine;
 public class Tile : MonoBehaviour
 {
     [Space]
-    public ushort tileId;
+    public ushort stripId;
+    public ushort pixelAddressInStrip;
     public RectInt rect;
 
     public Material material;
@@ -77,17 +78,5 @@ public class Tile : MonoBehaviour
         // #if UNITY_EDITOR
         //         UnityEditor.EditorUtility.SetDirty(rt);
         // #endif
-    }
-
-    public void ReadBack()
-    {
-        RenderTexture.active = rt;
-        tex.ReadPixels(rectFloat, 0, 0, false);
-        // tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0, false);
-        tex.Apply();
-        RenderTexture.active = null;
-
-        var colors = tex.GetPixels32();
-        LBClientSender.Instance.SetData(tileId, 0, colors);
     }
 }
