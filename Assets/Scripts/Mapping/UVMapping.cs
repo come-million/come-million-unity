@@ -78,10 +78,10 @@ public class UVMapping : MonoBehaviour
 
         mesh.uv = uvs;
 
-#if UNITY_EDITOR
-        UnityEditor.EditorUtility.SetDirty(mesh);
-        UnityEditor.AssetDatabase.SaveAssets();
-#endif
+// #if UNITY_EDITOR
+//         UnityEditor.EditorUtility.SetDirty(mesh);
+//         UnityEditor.AssetDatabase.SaveAssets();
+// #endif
 
         texture.Apply();
         RenderTexture.ReleaseTemporary(rt);

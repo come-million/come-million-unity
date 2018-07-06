@@ -15,7 +15,7 @@ public class Tile : MonoBehaviour
     public RenderTexture rt;
 
     public Texture2D tex;
-    Mesh mesh;
+    public Mesh mesh;
     Vector4 res;
     int resProp;
     Rect rectFloat;
@@ -39,9 +39,6 @@ public class Tile : MonoBehaviour
             wrapMode = TextureWrapMode.Clamp,
         };
 
-        mat2 = GetComponent<Renderer>().material;
-        mat2.mainTexture = rt;
-
         mesh = GetComponent<MeshFilter>().sharedMesh;
 
         res = new Vector4(rect.x, rect.y, rect.width, rect.height);
@@ -51,12 +48,26 @@ public class Tile : MonoBehaviour
         texelSize = Shader.PropertyToID("_TexelSize");
         modelMatrix = Shader.PropertyToID("_ModelMatrix");
 
+        var propertyBlock = new MaterialPropertyBlock();
+        mat2 = GetComponent<Renderer>().sharedMaterial;
+        // mat2 = GetComponent<Renderer>().material;
+        // mat2.mainTexture = rt;
+        // mat2.SetVector(resProp, res);
+        propertyBlock.SetTexture("_MainTex", rt);
+        propertyBlock.SetVector(resProp, res);
+        GetComponent<Renderer>().SetPropertyBlock(propertyBlock);
+
         RenderTexture.active = rt;
         GL.Clear(true, true, Color.clear);
         RenderTexture.active = null;
 
         m_transform = transform;
     }
+
+    // void Update()
+    // {
+    //     mat2.SetVector(resProp, res);
+    // }
 
     public void Render()
     {

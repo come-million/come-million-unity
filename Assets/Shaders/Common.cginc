@@ -64,7 +64,7 @@ float4 tri_pos(appdata v) {
     float2 s = _Resolution.zw * _TexelSize.zw;
     float2 pos = (v.uv + _Resolution.xy / _Resolution.zw) * s * 2 - 1;
     pos += -2*(v.bc.xy-1) * _TexelSize.zw;
-    pos.y = -pos.y;    
+    pos.y = -pos.y;
     return float4(pos, 0, 1);
 }
 

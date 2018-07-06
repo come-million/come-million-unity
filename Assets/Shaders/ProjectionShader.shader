@@ -55,14 +55,19 @@
 
 			fixed4 frag (v2f i) : SV_Target
 			{
+				// return float4(i.uv, 0, 1);
 				// return i.pos;
+				
+				// if(i.pos.z > 0)
+					// discard;
 
 				if(i.pos.x < 0 || i.pos.x > 1)
 					discard;
 				if(i.pos.y < 0 || i.pos.y > 1)
 					discard;
 
-				return (tex2D(_ProjectionTex, i.pos.xy) * _Tint ).grba;
+				float4 col = tex2D(_ProjectionTex, i.pos.xy) * _Tint;
+				return col.grba;
 			}
 			ENDCG
 		}

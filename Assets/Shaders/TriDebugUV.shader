@@ -3,7 +3,7 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		_Resolution ("Resolution", Vector) = (10, 5, 10, 5)
+		// _Resolution ("Resolution", Vector) = (10, 5, 10, 5)
 		// _Highlight ("Highlight", Range(0, 50)) = 0
 	}
 	SubShader

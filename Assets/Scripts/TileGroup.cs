@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 public class TileGroup : MonoBehaviour
 {
@@ -13,7 +16,10 @@ public class TileGroup : MonoBehaviour
     Tile[] tiles;
     List<Color32[]> tilesPixels;
 
+    [System.Serializable]
+    public class TextureEvent : UnityEvent<Texture> { }
 
+    public TextureEvent OnTextureReady;
     void Awake()
     {
         tiles = GetComponentsInChildren<Tile>();
@@ -30,6 +36,7 @@ public class TileGroup : MonoBehaviour
             wrapMode = TextureWrapMode.Clamp,
         };
         rt.Create();
+        OnTextureReady.Invoke(rt);
 
         tex = new Texture2D(rect.width, rect.height, TextureFormat.ARGB32, false, false)
         {
@@ -49,12 +56,46 @@ public class TileGroup : MonoBehaviour
         StartCoroutine(Run());
     }
 
+    void FillCommandBuffer(CommandBuffer cmd)
+    {
+        cmd.Clear();
+        cmd.SetRenderTarget(rt);
+        cmd.ClearRenderTarget(true, true, Color.clear);
+
+        var resProp = Shader.PropertyToID("_Resolution");
+        var texelSize = Shader.PropertyToID("_TexelSize");
+        var modelMatrix = Shader.PropertyToID("_ModelMatrix");
+
+        foreach (var m in materials)
+        {
+            if (m == null)
+                continue;
+            foreach (var t in tiles)
+            {
+                var r = t.rect;
+                var res = new Vector4(r.x, r.y, r.width, r.height);
+                cmd.SetGlobalVector(resProp, res);
+                cmd.SetGlobalVector(texelSize, new Vector4(rt.width, rt.height, 1f / rt.width, 1f / rt.height));
+                cmd.SetGlobalMatrix(modelMatrix, t.transform.localToWorldMatrix);
+                cmd.DrawMesh(t.mesh, Matrix4x4.identity, m);
+            }
+        }
+
+        // cmd.SetRenderTarget(BuiltinRenderTextureType.None);
+    }
+
     private IEnumerator Run()
     {
         var director = GetComponent<UnityEngine.Playables.PlayableDirector>();
         var timeProp = Shader.PropertyToID("_Time");
         yield return null;
         var w = new WaitForEndOfFrame();
+
+        var cmd = new CommandBuffer();
+        FillCommandBuffer(cmd);
+        var mats = new Material[materials.Length];
+        Array.Copy(materials, mats, materials.Length);
+
         while (true)
         {
             if (director != null)
@@ -63,6 +104,14 @@ public class TileGroup : MonoBehaviour
                 var time = new Vector4(dt / 20, dt, dt * 2, dt * 3);
                 Shader.SetGlobalVector(timeProp, time);
             }
+
+            // if (!mats.SequenceEqual(materials))
+            // {
+            //     FillCommandBuffer(cmd);
+            //     mats = new Material[materials.Length];
+            //     Array.Copy(materials, mats, materials.Length);
+            // }
+            // Graphics.ExecuteCommandBuffer(cmd);
 
             RenderTexture.active = rt;
             GL.Clear(true, true, Color.clear);
@@ -81,24 +130,29 @@ public class TileGroup : MonoBehaviour
 
             RenderTexture.active = null;
 
-#if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(rt);
-            UnityEditor.SceneView.RepaintAll();
-#endif
+// #if UNITY_EDITOR
+//             UnityEditor.EditorUtility.SetDirty(rt);
+//             UnityEditor.SceneView.RepaintAll();
+// #endif
             yield return w;
 
             ReadAndSend();
         }
     }
 
-    public static void CopyRect(Color32[] src, Color32[] dst, RectInt r)
+    public void CopyRect(Color32[] src, Color32[] dst, RectInt r)
     {
         int rows = r.height;
-        int w = r.width;
-        for (int i = 0; i < rows; i++)
-        {
-            Array.Copy(src, r.x + (r.y + i) * w, dst, i * w, w);
-        }
+        int w = rt.width;
+        int rw = r.width;
+        // try
+        // {
+            for (int i = 0; i < rows; i++)
+            {
+                Array.Copy(src, r.x + (r.y + i) * w, dst, i * rw, rw);
+            }
+        // }
+        // catch (Exception) { }
     }
 
     void ReadAndSend()
@@ -117,8 +171,8 @@ public class TileGroup : MonoBehaviour
             RectInt r1 = t.rect;
             var c = tilesPixels[i];
             CopyRect(colors, c, r1);
-            // t.tex.SetPixels32(c);
-            // t.tex.Apply();
+            t.tex.SetPixels32(c);
+            t.tex.Apply();
             LBClientSender.Instance.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
         }
     }

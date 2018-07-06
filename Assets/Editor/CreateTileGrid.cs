@@ -7,6 +7,8 @@ public class TileGridWizard : ScriptableWizard
 {
     [Tooltip("Tile Prefab to clone")]
     public GameObject Tile;
+
+    public Transform parent;
     public int Rows = 10;
     public int Columns = 10;
 
@@ -18,8 +20,6 @@ public class TileGridWizard : ScriptableWizard
 
     void OnWizardCreate()
     {
-        var group = new GameObject("TileGroup", typeof(TileGroup));
-
         float x = Mathf.Sqrt(1 + 0.5f * 0.5f) * 0.5f - 0.1f;
 
         for (int j = 0; j < Rows; j++)
@@ -37,7 +37,7 @@ public class TileGridWizard : ScriptableWizard
                 t.rect.x += i * t.rect.width;
                 t.rect.y += j * t.rect.height;
 
-                t.transform.SetParent(group.transform);
+                t.transform.SetParent(parent);
                 var b = t.GetComponent<MeshFilter>().sharedMesh.bounds;
                 t.transform.position = new Vector3(i * (b.size.x - x) + (j % 2 == 1 ? 0.55f : 0), 0, j * (b.size.z + 0.05f));
             }

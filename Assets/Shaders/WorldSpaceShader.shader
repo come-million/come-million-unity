@@ -45,7 +45,7 @@
 			{
                 // return i.pos;
 				#define PI 3.1415926535897932384626433832795
-				return float4(cos(i.pos.xyz * 2 + _Offset.xyz) * _Tint.rgb, 1);
+				return float4(cos(i.pos.xyz * 0.5 + _Offset.xyz) * _Tint.rgb, 1);
 				// // return float4(cos(i.pos.x * 2 + _Offset.x), 0, 0, 1);
 				// float4 col = 0;
                 // col.r = tri(i.pos.x * 2 + _Time.y, 1);
