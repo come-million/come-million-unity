@@ -65,6 +65,8 @@ public class LBClientSender : MonoBehaviour {
 	}
 	
 	void Update () {
+        if(m_udpClient == null)
+            return;
         m_lastFrameId++;
         foreach (byte[] segmentByteArray in m_allSegments.Values)
         {
