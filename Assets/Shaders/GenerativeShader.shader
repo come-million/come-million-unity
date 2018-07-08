@@ -34,7 +34,10 @@
 				// o.pos2 = o.vertex * 0.5 + 0.5;
 				float2 s = _Resolution.zw * _TexelSize.zw;
 				// o.pos2 = (v.uv2 + _Resolution.xy / _Resolution.zw) * s;
-				o.pos2 = (v.uv2 + (_Resolution.xy + 0.5) / _Resolution.zw) * s;
+				// o.pos2 = (v.uv2 + (_Resolution.xy + 0.5) / _Resolution.zw) * s;
+				float fx = _Resolution.y % 2 == 0;
+				o.pos2 = (v.uv2 + (_Resolution.xy - fx) / _Resolution.zw) * s;
+				
 				return o;
 			}
 
