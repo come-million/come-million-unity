@@ -74,7 +74,7 @@
 				// return float4(x*y, y, 0, 1).grba;
 
 				float4 col = float4(i.uv, 0, 1);
-				col = lerp(col, float4(0, 0, 1, 1), saturate(x*y));
+				col = lerp(col, float4(1, 0, 1, 1), saturate(x*y));
 				return (col * _Tint).grba;
 			}
 			ENDCG
