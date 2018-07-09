@@ -95,10 +95,10 @@ namespace ComeMillion
             yield return null;
             var w = new WaitForEndOfFrame();
 
-            var cmd = new CommandBuffer();
-            FillCommandBuffer(cmd);
-            var mats = new Material[materials.Length];
-            Array.Copy(materials, mats, materials.Length);
+            // var cmd = new CommandBuffer();
+            // FillCommandBuffer(cmd);
+            // var mats = new Material[materials.Length];
+            // Array.Copy(materials, mats, materials.Length);
 
             while (true)
             {
@@ -109,30 +109,30 @@ namespace ComeMillion
                     Shader.SetGlobalVector(timeProp, time);
                 }
 
-                if (!mats.SequenceEqual(materials))
-                {
-                    FillCommandBuffer(cmd);
-                    mats = new Material[materials.Length];
-                    Array.Copy(materials, mats, materials.Length);
-                }
-                Graphics.ExecuteCommandBuffer(cmd);
-
-                // RenderTexture.active = rt;
-                // GL.Clear(true, true, Color.clear);
-
-                // foreach (var m in materials)
+                // if (!mats.SequenceEqual(materials))
                 // {
-                //     if (m == null)
-                //         continue;
-                //     foreach (var t in tiles)
-                //     {
-                //         t.rt = rt;
-                //         t.material = m;
-                //         t.Render();
-                //     }
+                //     FillCommandBuffer(cmd);
+                //     mats = new Material[materials.Length];
+                //     Array.Copy(materials, mats, materials.Length);
                 // }
+                // Graphics.ExecuteCommandBuffer(cmd);
 
-                // RenderTexture.active = null;
+                RenderTexture.active = rt;
+                GL.Clear(true, true, Color.clear);
+
+                foreach (var m in materials)
+                {
+                    if (m == null)
+                        continue;
+                    foreach (var t in tiles)
+                    {
+                        t.rt = rt;
+                        t.material = m;
+                        t.Render();
+                    }
+                }
+
+                RenderTexture.active = null;
 
                 // #if UNITY_EDITOR
                 //             UnityEditor.EditorUtility.SetDirty(rt);

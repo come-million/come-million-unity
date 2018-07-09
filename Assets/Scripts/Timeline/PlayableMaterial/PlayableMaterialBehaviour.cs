@@ -36,10 +36,15 @@ public class PlayableMaterialBehaviour : PlayableBehaviour
 
             // Debug.LogFormat("weight: {0}, mat:{1}, idx:{2}", inputWeight, input.material, input.index);
 
-            if (inputWeight == 1)
+
+            // if (inputWeight == 1)
+            if (inputWeight > 0)
             {
                 m_TrackBinding.materials[input.index] = input.material;
             }
+
+            if (input.material != null)
+                input.material.SetFloat("_Alpha", inputWeight);
         }
     }
 

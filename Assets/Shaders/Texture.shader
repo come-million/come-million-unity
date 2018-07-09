@@ -3,12 +3,13 @@
 	Properties
 	{
 		_MainTex ("MainTex", 2D) = "white" {}
+		_Alpha ("Alpha", Float) = 1
 	}
 	SubShader
 	{
 		Cull Off
 		// ZTest Off ZWrite Off
-		// Blend SrcAlpha OneMinusSrcAlpha
+		Blend SrcAlpha OneMinusSrcAlpha
 		// Blend One One
 
 		Pass
@@ -24,6 +25,7 @@
 			sampler2D _GradientTex;
 			float4 _Tint;
 			float4 _Offset;
+			float _Alpha;
 
 			struct v2f
 			{
@@ -49,6 +51,7 @@
 			{
 				float2 uv = i.pos;
 				float4 col = tex2D(_MainTex, uv + _Offset.xy);
+				col.a *= _Alpha;
 				return (col * _Tint).grba;
 			}
 			ENDCG

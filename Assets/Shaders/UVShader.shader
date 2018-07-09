@@ -44,6 +44,9 @@
 				o.uv.y = 1 - o.uv.y;
 				o.uv.x += 0.5 * _MainTex_TexelSize.x;
 				o.uv.y -= 0.5 * _MainTex_TexelSize.y;
+				#else
+				o.uv.x += 0.5 * _MainTex_TexelSize.x;
+				o.uv.y += 0.5 * _MainTex_TexelSize.y;
 				#endif
 				o.color = v.color;
 				return o;
