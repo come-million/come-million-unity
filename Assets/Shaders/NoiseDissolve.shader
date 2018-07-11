@@ -39,6 +39,7 @@
 				// o.pos = (v.uv2 + (_Resolution.xy + 0.5) / _Resolution.zw) * s;
 				float fx = _Resolution.y % 2 == 0;
 				o.pos = (v.uv2 + (_Resolution.xy - float2(fx, 0)) / _Resolution.zw) * s;
+				o.pos += _Group.xy / _Group.zw;
 				o.pos = o.pos * _MainTex_ST.xy + _MainTex_ST.zw;
 				// o.pos = v.uv2;
 				// o.pos += _Resolution.xy * _TexelSize.xy;
@@ -52,12 +53,12 @@
 				
 				uv.x += _Time.y * 0.1;
 				// return float4(uv, 0, 1);
-				float r = tex2D(_MainTex, uv + _Time.xx * 0.015).r;
+				float r = tex2D(_MainTex, uv + _Time.xx * 0.0015).r;
 				float z = tex2D(_MainTex, r.xx + _Time.xy * 0.125);
-				z = pow(z + 0.25, 2);
-				float4 col = tex2D(_GradientTex, float2(z, _Time.x * 2));
+				z = pow(z + 0.25, 8);
+				float4 col = tex2D(_GradientTex, float2(z, _Time.x * 0.5));
 				float z2 = tex2D(_MainTex, z);
-				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * 2 - 0.5));
+				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * 1 - 0.5));
 				col = lerp(col, col2, r);
 				return (col * _Tint).grba;
 			}

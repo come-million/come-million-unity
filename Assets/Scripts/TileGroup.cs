@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Playables;
 using UnityEngine.Rendering;
 
 namespace ComeMillion
 {
     public class TileGroup : MonoBehaviour
     {
+        public LBClientSender client;
+        public PlayableDirector director;
         public RectInt rect;
         public Material[] materials;
         public RenderTexture rt;
@@ -42,7 +45,7 @@ namespace ComeMillion
             rt.Create();
             OnTextureReady.Invoke(rt);
 
-            tex = new Texture2D(rect.width, rect.height, TextureFormat.ARGB32, false, false)
+            tex = new Texture2D(rect.width, rect.height, TextureFormat.ARGB32, true, false)
             {
                 filterMode = FilterMode.Point,
                 wrapMode = TextureWrapMode.Clamp,
@@ -90,8 +93,9 @@ namespace ComeMillion
 
         private IEnumerator Run()
         {
-            var director = GetComponent<UnityEngine.Playables.PlayableDirector>();
+            // var director = GetComponent<UnityEngine.Playables.PlayableDirector>();
             var timeProp = Shader.PropertyToID("_Time");
+            var groupProp = Shader.PropertyToID("_Group");
             yield return null;
             var w = new WaitForEndOfFrame();
 
@@ -128,6 +132,7 @@ namespace ComeMillion
                     {
                         t.rt = rt;
                         t.material = m;
+                        t.material.SetVector(groupProp, new Vector4(rect.x, rect.y, rect.width, rect.height));
                         t.Render();
                     }
                 }
@@ -177,8 +182,15 @@ namespace ComeMillion
                 CopyRect(colors, c, r1);
                 // t.tex.SetPixels32(c);
                 // t.tex.Apply();
-                LBClientSender.Instance.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
+                client.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
             }
+
+            // var p = tex.GetPixels32(tex.mipmapCount - 1);
+            // var strips = tiles.GroupBy(t => t.stripId).Select(g => g);
+            // foreach (var strip in strips)
+            // {
+            //     client.SetData(strip, 0, p);
+            // }
         }
     }
 }

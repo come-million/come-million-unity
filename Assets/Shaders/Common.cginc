@@ -3,6 +3,7 @@
 
 float4 _Resolution;
 float4 _TexelSize;
+float4 _Group;
 
 struct appdata
 {
@@ -10,6 +11,7 @@ struct appdata
     float2 uv : TEXCOORD0;
     float2 uv2 : TEXCOORD1;
     float4 bc : COLOR;
+    float4 normal : NORMAL;
 };
 
 struct v2g

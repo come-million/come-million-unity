@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class LBClientSender : MonoBehaviour {
 
+    public int ClientPort = 0;
     public int LBServerPort = 2000;
     public string LBServerIP = "10.0.0.215";
 
@@ -23,7 +24,6 @@ public class LBClientSender : MonoBehaviour {
     // segments that we are working with.
     // the key to the dictionary is a 32bit number which is the union of the strip id and pixel address
     private Dictionary<uint, byte[]> m_allSegments = new Dictionary<uint, byte[]>();
-    public static LBClientSender Instance;
 
     public void SetData(ushort stripId, ushort pixelAddressInStrip, Color32[] colors)
     {
@@ -53,14 +53,11 @@ public class LBClientSender : MonoBehaviour {
             msgByteArr[pixelBufferIndex + 2] = colors[i].b;
         }
     }
-
-    void Awake() {
-        Instance = this;
-    }
     
 	void Start () {
         m_lastFrameId = (uint)Random.Range(0, 10000);
-        m_udpClient = new UdpClient(LBServerPort);
+        m_udpClient = new UdpClient(ClientPort);
+        ClientPort = (m_udpClient.Client.LocalEndPoint as IPEndPoint).Port;
         m_targetIP = new IPEndPoint(IPAddress.Parse(LBServerIP), LBServerPort);
 	}
 	

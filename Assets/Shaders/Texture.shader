@@ -43,6 +43,7 @@
 				// o.pos = (v.uv2 + (_Resolution.xy - fx) / _Resolution.zw) * s;
 				// o.pos = (v.uv2 + (_Resolution.xy) / _Resolution.zw) * s;
 				// o.pos = (v.uv2 + (_Resolution.xy + 0.5) / _Resolution.zw) * s;
+				o.pos += _Group.xy / _Group.zw;
 				o.pos = o.pos * _MainTex_ST.xy + _MainTex_ST.zw;
 				return o;
 			}

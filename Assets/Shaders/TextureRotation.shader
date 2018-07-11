@@ -3,6 +3,7 @@
 	Properties
 	{
 		_MainTex ("MainTex", 2D) = "white" {}
+		_Speed ("Rotation Speed", Float) = 4
 		_Alpha ("Alpha", Float) = 1
 	}
 	SubShader
@@ -26,6 +27,7 @@
 			float4 _Tint;
 			float4 _Offset;
 			float _Alpha;
+			float _Speed;
 
 			struct v2f
 			{
@@ -47,8 +49,9 @@
 				float2 s = _Resolution.zw * _TexelSize.zw;
 				float fx = _Resolution.y % 2 == 0;
 				o.pos = (v.uv2 + (_Resolution.xy - float2(fx, 0)) / _Resolution.zw) * s;
+				o.pos += _Group.xy / _Group.zw;
 				o.pos = o.pos * _MainTex_ST.xy + _MainTex_ST.zw;
-				o.pos = rotate(o.pos - 0.5, _Time.y*3) + 0.5;
+				o.pos = rotate(o.pos - 0.5, _Time.y*_Speed) + 0.5;
 				return o;
 			}
 
