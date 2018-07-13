@@ -40,8 +40,9 @@
                 o.pos = mul(_ModelMatrix, o.pos);
 				// o.normal = mul(_ModelMatrix, float4(0, -1, 0, 0));
 				
-				float n = dot(v.normal.xyz, float3(0, -1, 0));
-				o.normal = mul(_ModelMatrix, float4(sign(n) * v.normal.xyz, 0));
+				// float n = dot(v.normal.xyz, float3(0, -1, 0));
+				// o.normal = mul(_ModelMatrix, float4(sign(n) * v.normal.xyz, 0));
+				o.normal = mul(_ModelMatrix, float4(v.normal.xyz, 0));
 				// o.normal = v.normal;
 				return o;
 			}
@@ -58,7 +59,7 @@
                 // return float4(i.normal * 0.5 + 0.5, 1);
 				float3 l = normalize(i.pos.xyz - p.xyz);
 				float r = distance(i.pos.xyz, p.xyz);
-				r = 4 / r;
+				r = 8 / r;
 				r = smoothstep(0, 1, saturate(r));
 				r *= max(0, dot(l, i.normal));
 				return float4(r * _Tint.rgb, 1);

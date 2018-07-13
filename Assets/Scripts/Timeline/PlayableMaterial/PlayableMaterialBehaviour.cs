@@ -14,6 +14,8 @@ public class PlayableMaterialBehaviour : PlayableBehaviour
 
     bool m_FirstFrameHappened;
 
+    int alphaProp = Shader.PropertyToID("_Alpha");
+
     public override void ProcessFrame(Playable playable, FrameData info, object playerData)
     {
         m_TrackBinding = playerData as TileGroup;
@@ -44,7 +46,7 @@ public class PlayableMaterialBehaviour : PlayableBehaviour
             }
 
             if (input.material != null)
-                input.material.SetFloat("_Alpha", inputWeight);
+                input.material.SetFloat(alphaProp, inputWeight);
         }
     }
 

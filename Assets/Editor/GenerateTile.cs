@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Linq;
+using System;
 
 public class CreateTileWizard : ScriptableWizard
 {
@@ -69,14 +70,48 @@ public class TileGenerator
 
         m.vertices = verts;
 
-        m.triangles = Enumerable.Range(0, rows * cols)
-            .Select(i => new int[] { 2, 1, 0 }
-            // .Select(i => (i % 2 == 0 ?
-            //     new int[] { 2, 1, 0 } :
-            //     new int[] { 0, 1, 2 })
-            .Select(j => j + i * 3))
-        .SelectMany(i => i)
-        .ToArray();
+        int[] triangles = new int[rows * cols * 3];
+        int[] indices = new int[] { 0, 1, 2, 2, 1, 0 };
+
+        for (int i = 0; i < cols / 2; i++)
+        {
+            for (int j = 0; j < rows; j++)
+            {
+                int k = i + j * cols / 2;
+
+                if (j % 2 == 1)
+                {
+
+                    triangles[k * 6 + 0] = 0 + k * 6;
+                    triangles[k * 6 + 1] = 1 + k * 6;
+                    triangles[k * 6 + 2] = 2 + k * 6;
+
+                    triangles[k * 6 + 3] = 5 + k * 6;
+                    triangles[k * 6 + 4] = 4 + k * 6;
+                    triangles[k * 6 + 5] = 3 + k * 6;
+                }
+                else
+                {
+                    triangles[k * 6 + 0] = 2 + k * 6;
+                    triangles[k * 6 + 1] = 1 + k * 6;
+                    triangles[k * 6 + 2] = 0 + k * 6;
+
+                    triangles[k * 6 + 3] = 3 + k * 6;
+                    triangles[k * 6 + 4] = 4 + k * 6;
+                    triangles[k * 6 + 5] = 5 + k * 6;
+                }
+            }
+        }
+        m.triangles = triangles;
+
+        // m.triangles = Enumerable.Range(0, rows * cols)
+        //     // .Select(i => new int[] { 2, 1, 0 }
+        //     .Select(i => (i % 2 == 0 ?
+        //         new int[] { 2, 1, 0 } :
+        //         new int[] { 0, 1, 2 })
+        //     .Select(j => j + i * 3))
+        // .SelectMany(i => i)
+        // .ToArray();
 
         m.uv = Enumerable.Range(0, rows).Select(j =>
                 Enumerable.Range(0, cols).SelectMany(i =>
@@ -88,7 +123,7 @@ public class TileGenerator
                 .ToArray();
 
         m.uv2 = m.uv;
-        
+
         // m.normals = verts.Select(v => Vector3.up).ToArray();
 
         // var centers = Enumerable.Range(0, rows * cols).Select(i =>
