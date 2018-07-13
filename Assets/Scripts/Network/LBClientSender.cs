@@ -59,6 +59,7 @@ public class LBClientSender : MonoBehaviour {
         m_udpClient = new UdpClient(ClientPort);
         ClientPort = (m_udpClient.Client.LocalEndPoint as IPEndPoint).Port;
         m_targetIP = new IPEndPoint(IPAddress.Parse(LBServerIP), LBServerPort);
+        m_udpClient.Connect(m_targetIP);
 	}
 	
 	void Update () {
@@ -68,7 +69,8 @@ public class LBClientSender : MonoBehaviour {
         foreach (byte[] segmentByteArray in m_allSegments.Values)
         {
             writeUint32ToArray(segmentByteArray, 8, m_lastFrameId);
-            m_udpClient.Send(segmentByteArray, segmentByteArray.Length, m_targetIP);
+            // m_udpClient.Send(segmentByteArray, segmentByteArray.Length, m_targetIP);
+            m_udpClient.Send(segmentByteArray, segmentByteArray.Length);
         }
     }
 

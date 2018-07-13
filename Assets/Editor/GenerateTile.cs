@@ -71,7 +71,6 @@ public class TileGenerator
         m.vertices = verts;
 
         int[] triangles = new int[rows * cols * 3];
-        int[] indices = new int[] { 0, 1, 2, 2, 1, 0 };
 
         for (int i = 0; i < cols / 2; i++)
         {

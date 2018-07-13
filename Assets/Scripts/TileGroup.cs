@@ -185,12 +185,12 @@ namespace ComeMillion
                 client.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
             }
 
-            // var p = tex.GetPixels32(tex.mipmapCount - 1);
-            // var strips = tiles.GroupBy(t => t.stripId).Select(g => g);
-            // foreach (var strip in strips)
-            // {
-            //     client.SetData(strip, 0, p);
-            // }
+            var p = tex.GetPixels32(tex.mipmapCount - 1);//.Take(1).ToArray();
+            var strips = tiles.Select(t => t.stripId).Distinct();
+            foreach (var strip in strips)
+            {
+                client.SetData(strip, 0, p);
+            }
         }
     }
 }
