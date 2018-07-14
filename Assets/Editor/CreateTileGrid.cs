@@ -10,7 +10,7 @@ public class TileGridWizard : ScriptableWizard
     public GameObject Tile;
 
     public Transform parent;
-    public int Rows = 10;
+    public int Rows = 5;
     public int Columns = 10;
 
     [MenuItem("Tools/Create Tile Grid...")]
