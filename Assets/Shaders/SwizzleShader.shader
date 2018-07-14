@@ -85,7 +85,7 @@ Shader "Custom/Swizzle"
 				half4 color = tex2D(_MainTex, IN.texcoord) * IN.color;
 				// clip (color.a - 0.01);
 				color.a = 1;
-				return color.grba;
+				return color.rgba;
 			}
 		ENDCG
 		}

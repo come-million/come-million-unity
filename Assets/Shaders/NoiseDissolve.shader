@@ -60,7 +60,7 @@
 				float z2 = tex2D(_MainTex, z);
 				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * 1 - 0.5));
 				col = lerp(col, col2, r);
-				return (col * _Tint).grba;
+				return (col * _Tint).rgba;
 			}
 			ENDCG
 		}

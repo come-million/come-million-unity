@@ -67,7 +67,7 @@
 					discard;
 
 				float4 col = tex2D(_ProjectionTex, i.pos.xy) * _Tint;
-				return col.grba;
+				return col.rgba;
 			}
 			ENDCG
 		}

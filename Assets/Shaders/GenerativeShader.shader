@@ -79,7 +79,7 @@
 				// col.a = 1;
 				// col.a = any(col.rgb > 0);
 
-				return col.grba;
+				return col.rgba;
 
 
 			}

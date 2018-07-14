@@ -53,7 +53,7 @@
 				float2 uv = i.pos;
 				float4 col = tex2D(_MainTex, uv + _Offset.xy);
 				col.a *= _Alpha;
-				return (col * _Tint).grba;
+				return (col * _Tint).rgba;
 			}
 			ENDCG
 		}
