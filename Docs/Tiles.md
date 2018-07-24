@@ -52,6 +52,7 @@ Physical tiles are usually connected vertically, from bottom to top, so values f
 |0|10|100|-|5|10|100|
 |0|5 |50 |-|5|5 |50 |
 |0|0 |0  |-|5|0 |0  |
+
 *(Bottom, power and data cables to controller)*
 
 
