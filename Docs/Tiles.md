@@ -6,12 +6,12 @@ This components is the main glue between the rendering and the LED clients.
 
 It's responsible for rendering it's children (tiles) to a `RenderTexture`, it reads the content back (via `Texture2D.ReadPixels` & `Texture2D.GetPixels32`), cuts it according to each `Tile`'s rectangle and passes it to the client (**LBClientSender**).
 
-    Many TileGroups can be connected to the same client, for but for perfomance reasons fewer is better.
+> Many TileGroups can be connected to the same client, for but for performance reasons fewer is better.
 
 The `Rect` member is the offset and size in pixels\triangles. It determines the size of the render target and shifts the UV for all in child tiles.
 It's width and height (W&H) must match the number of pixels it renders.
 
-e.g, In the image there are 5x10 (*rows* x *cols*) tiles (not all columns visible), each tile is 5x10 (*rows* x *cols*) pixels, so it renders 100x25 (*cols* x *rows*) pixels, **W**=10x10, **H**=5x5.
+> e.g, In the image there are 5x10 (*rows* x *cols*) tiles (not all columns visible), each tile is 5x10 (*rows* x *cols*) pixels, so it renders 100x25 (*cols* x *rows*) pixels, **W**=10x10, **H**=5x5.
 
 Should there be another `TileGroup` to the right of this one, it's **X** would be 100.
 

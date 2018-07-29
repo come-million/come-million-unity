@@ -9,11 +9,11 @@ It comes with a few standard track types, like *Animation Track* which can recor
 First of which, as seen in the first track group in the image (yellow clips) is a custom track that controls the materials of a `TileGroup`.
 
 You must first assign a `TileGroup` in the left side, then right-click the timeline and add select "Add Playable Material Clip".
-Select the clip, and expand it's **Template** member in the inspector.
+Select the clip, and expand its **Template** member in the inspector.
 Assign the **Material** to be switched.
 The **Index** is the index of the `TileGroup`'s material array to switch (within array bounds).
 
-In the image below you can see The inspectors for the `TileGroup` and the clip, and how **TextureMat** is assigned to index 0 of the materials array.
+In the image below you can see the inspectors for the `TileGroup` and the clip, and how **TextureMat** is assigned to index 0 of the materials array.
 
 ![PlayableMaterialClip](PlayableMaterialClip.png)
 
