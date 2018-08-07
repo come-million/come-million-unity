@@ -8,7 +8,7 @@
 	SubShader
 	{
 		Cull Off
-		
+		Blend SrcAlpha OneMinusSrcAlpha
 		Pass
 		{
 			CGPROGRAM
@@ -20,6 +20,7 @@
 			
 			float4 _Offset;
 			float4 _Tint;
+			float _Alpha;
 
 			sampler2D _ProjectionTex;
 			float4x4 _ModelMatrix;
@@ -67,6 +68,7 @@
 					discard;
 
 				float4 col = tex2D(_ProjectionTex, i.pos.xy) * _Tint;
+				//col.a *= _Alpha;
 				return col.rgba;
 			}
 			ENDCG

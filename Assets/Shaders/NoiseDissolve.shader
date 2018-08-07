@@ -51,10 +51,10 @@
 			{
 				float2 uv = i.pos;
 				
-				uv.x += _Time.y * 0.1;
+				uv.x += _Time.y * 0.025;
 				// return float4(uv, 0, 1);
 				float r = tex2D(_MainTex, uv + _Time.xx * 0.0015).r;
-				float z = tex2D(_MainTex, r.xx + _Time.xy * 0.125);
+				float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
 				z = pow(z + 0.25, 8);
 				float4 col = tex2D(_GradientTex, float2(z, _Time.x * 0.5));
 				float z2 = tex2D(_MainTex, z);
