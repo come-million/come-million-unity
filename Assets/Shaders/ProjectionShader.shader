@@ -4,6 +4,14 @@
 	{
 		// _Offset ("Offset", Vector) = (0, 0, 0, 0)
 		_ProjectionTex ("Projection Texture", 2D) = "" {}
+		_Alpha ("Alpha", Float) = 1
+
+		[Header(Color Correction)]
+		_Gamma ("Gamma", Float) = 1
+		_Brightness ("Brightness", Float) = 0
+		_Contrast ("Contrast", Float) = 1
+		_Saturation ("Saturation", Float) = 1
+		_Hue ("Hue", Float) = 0	
 	}
 	SubShader
 	{
@@ -27,6 +35,13 @@
 			float4x4 _ViewMatrix;
 			float4x4 _ProjectionMatrix;
 			bool _IsOrtho;
+
+			float _Gamma;
+			float _Brightness;
+			float _Contrast;
+			float _Saturation;
+			float _Hue;
+
 
 			struct v2f
 			{
@@ -68,7 +83,16 @@
 					discard;
 
 				float4 col = tex2D(_ProjectionTex, i.pos.xy) * _Tint;
-				//col.a *= _Alpha;
+				col.a *= _Alpha;
+
+				col = pow(col, _Gamma);
+				col = (col - 0.5) * _Contrast + 0.5 + _Brightness;
+				col = lerp(dot(col, float3(0.2126, 0.7152, 0.0722)), col, _Saturation);
+				col.rgb = RGBtoHSV(col.rgb);
+				col.r = fmod(col.r + _Hue, 1);
+				col.rgb = HSVtoRGB(col.rgb);
+
+
 				return col.rgba;
 			}
 			ENDCG

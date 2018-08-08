@@ -39,6 +39,7 @@ namespace ComeMillion
 
             rt = new RenderTexture(rect.width, rect.height, 0, RenderTextureFormat.ARGB32)
             {
+                name = this.name + "_RT",
                 filterMode = FilterMode.Point,
                 wrapMode = TextureWrapMode.Clamp,
             };

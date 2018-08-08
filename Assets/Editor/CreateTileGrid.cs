@@ -11,7 +11,12 @@ public class TileGridWizard : ScriptableWizard
 
     public Transform parent;
     public int Rows = 5;
-    public int Columns = 10;
+    public int Columns = 8;
+    public ushort StartingStripId = 0;
+
+    public bool FlipEvenOddRows = false;
+    public bool ToLeft = false;
+
 
     [MenuItem("Tools/Create Tile Grid...")]
     static void CreateWizard()
@@ -19,8 +24,9 @@ public class TileGridWizard : ScriptableWizard
         ScriptableWizard.DisplayWizard<TileGridWizard>("Create a grid of tiles");
     }
 
-    void OnWizardCreate()
+    void OnWizardUpdate()
     {
+        Tile = Tile ?? AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/TilePF.prefab");
         if (Tile == null)
         {
             isValid = false;
@@ -29,6 +35,11 @@ public class TileGridWizard : ScriptableWizard
         }
         isValid = true;
 
+        parent = parent ?? Selection.activeGameObject.transform;
+    }
+
+    void OnWizardCreate()
+    {
         float x = Mathf.Sqrt(1 + 0.5f * 0.5f) * 0.5f - 0.1f;
 
         for (int i = 0; i < Columns; i++)
@@ -42,15 +53,16 @@ public class TileGridWizard : ScriptableWizard
 
                 go.name = string.Format("Tile{0}_{1}", i, j);
                 var t = go.GetComponent<Tile>();
-                t.stripId = (ushort)(i);
+                t.stripId = (ushort)(StartingStripId + i);
                 t.pixelAddressInStrip = (ushort)(50 * j);
 
-                t.rect.x += i * t.rect.width;
-                t.rect.y += j * t.rect.height;
+                t.rect.x = (ToLeft ? (Columns - i - 1) : i) * t.rect.width;
+                t.rect.y = j * t.rect.height;
 
                 t.transform.SetParent(parent);
                 var b = t.GetComponent<MeshFilter>().sharedMesh.bounds;
-                t.transform.position = new Vector3(i * (b.size.x - x) + (j % 2 == 1 ? 0.55f : 0), 0, j * (b.size.z + 0.05f));
+                var rowOffset = (j % 2 == (FlipEvenOddRows ? 0 : 1) ? 0.55f : 0);
+                t.transform.position = new Vector3((ToLeft ? -i : i) * (b.size.x - x) + rowOffset, 0, j * (b.size.z + 0.05f));
             }
         }
     }
