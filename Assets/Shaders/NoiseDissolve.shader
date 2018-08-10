@@ -72,17 +72,18 @@
 				uv.x += _Time.y * 0.025;
 				// return float4(uv, 0, 1);
 				float r = tex2D(_MainTex, uv + _Time.xx * 0.0015).r;
-				float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
-				z = pow(z + 0.25, 8);
+				float z = tex2D(_MainTex, r*0.25 + _Time.xy * 0.0625);
+				// float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
+				// z = pow(z + 0.25, 8);
 				float4 col = tex2D(_GradientTex, float2(z, _Time.x * 0.5));
-				float z2 = tex2D(_MainTex, z);
-				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * 1 - 0.5));
+				// float z2 = tex2D(_MainTex, z);
+				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * 0.5 - 0.667));
 				col = lerp(col, col2, r);
 				col.a *= _Alpha;
 
-				col = pow(col, _Gamma);
-				col = (col - 0.5) * _Contrast + 0.5 + _Brightness;
-				col = lerp(dot(col, float3(0.2126, 0.7152, 0.0722)), col, _Saturation);
+				col.rgb = pow(col.rgb, _Gamma);
+				col.rgb = (col.rgb - 0.5) * _Contrast + 0.5 + _Brightness;
+				col.rgb = lerp(dot(col.rgb, float3(0.2126, 0.7152, 0.0722)), col.rgb, _Saturation);
 				col.rgb = RGBtoHSV(col.rgb);
 				col.r = fmod(col.r + _Hue, 1);
 				col.rgb = HSVtoRGB(col.rgb);

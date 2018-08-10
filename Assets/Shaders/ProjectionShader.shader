@@ -85,9 +85,9 @@
 				float4 col = tex2D(_ProjectionTex, i.pos.xy) * _Tint;
 				col.a *= _Alpha;
 
-				col = pow(col, _Gamma);
-				col = (col - 0.5) * _Contrast + 0.5 + _Brightness;
-				col = lerp(dot(col, float3(0.2126, 0.7152, 0.0722)), col, _Saturation);
+				col.rgb = pow(col.rgb, _Gamma);
+				col.rgb = (col.rgb - 0.5) * _Contrast + 0.5 + _Brightness;
+				col.rgb = lerp(dot(col.rgb, float3(0.2126, 0.7152, 0.0722)), col.rgb, _Saturation);
 				col.rgb = RGBtoHSV(col.rgb);
 				col.r = fmod(col.r + _Hue, 1);
 				col.rgb = HSVtoRGB(col.rgb);
