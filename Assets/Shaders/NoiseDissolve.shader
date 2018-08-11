@@ -72,7 +72,7 @@
 				uv.x += _Time.y * 0.025;
 				// return float4(uv, 0, 1);
 				float r = tex2D(_MainTex, uv + _Time.xx * 0.0015).r;
-				float z = tex2D(_MainTex, r*0.25 + _Time.xy * 0.0625);
+				float z = tex2D(_MainTex, r*0.25 + _Time.xy * 0.0125);
 				// float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
 				// z = pow(z + 0.25, 8);
 				float4 col = tex2D(_GradientTex, float2(z, _Time.x * 0.5));
@@ -88,7 +88,8 @@
 				col.r = fmod(col.r + _Hue, 1);
 				col.rgb = HSVtoRGB(col.rgb);
 
-				return (col * _Tint).rgba;
+				//return (col * _Tint).rgba;
+				return col.rgba;
 			}
 			ENDCG
 		}

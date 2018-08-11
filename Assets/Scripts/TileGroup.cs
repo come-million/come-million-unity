@@ -21,15 +21,19 @@ namespace ComeMillion
 
         [NonSerialized]
         private List<Color32[]> tilesPixels;
+        private MeshRenderer[] tileRenderers;
 
         [System.Serializable]
         public class TextureEvent : UnityEvent<Texture> { }
 
         public TextureEvent OnTextureReady;
 
+        public bool ShowDebug = true;
+
         void Awake()
         {
             tiles = GetComponentsInChildren<Tile>();
+            tileRenderers = GetComponentsInChildren<MeshRenderer>();
 
             if (rect.size == Vector2Int.zero)
             {
@@ -137,6 +141,9 @@ namespace ComeMillion
                         t.Render();
                     }
                 }
+
+                foreach (var t in tileRenderers)
+                    t.enabled = ShowDebug;
 
                 RenderTexture.active = null;
 
