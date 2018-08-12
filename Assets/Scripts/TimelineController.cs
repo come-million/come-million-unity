@@ -47,8 +47,8 @@ public class TimelineController : MonoBehaviour
         for (int i = 0; i < playableDirectors.Count; i++)
         {
             PlayableDirector currentDir = playableDirectors[i];
-            PlayState timelineIsPlaying = currentDir.state;
-            //if (timelineIsPlaying == PlayState.Playing)
+            //PlayState timelineState = currentDir.state;
+            //if (timelineState == PlayState.Playing)
             if (currentDir.time > 0.0f)
                 numCurrentlyPlaying++;
         }
@@ -92,8 +92,9 @@ public class TimelineController : MonoBehaviour
 
         NumTimelinesPlaying = GetNumTimelinesPlaying();
 
-        timelineIsPlaying = NumTimelinesPlaying < 0;
+        timelineIsPlaying = NumTimelinesPlaying > 0;
 
+        float prevSkinBrightnessValue = SkinBrightnessValue;
         if (NumTimelinesPlaying <= 0)
         {
             TimerPlaystatePause += Time.deltaTime;
@@ -105,7 +106,7 @@ public class TimelineController : MonoBehaviour
         {
             TimerPlaystatePlay += Time.deltaTime;
             TimerPlaystatePause = 0.0f;
-            SkinBrightnessValue = Mathf.Clamp01(1.0f - TimerPlaystatePlay / TimeForSkinTransition);
+            SkinBrightnessValue = Mathf.Clamp01(1.0f - Mathf.Clamp01(TimerPlaystatePlay / TimeForSkinTransition));
         }
 
         if (SkinMats != null && SkinMats.Length > 0)
@@ -118,6 +119,7 @@ public class TimelineController : MonoBehaviour
                 SkinMats[i].SetFloat("_Alpha", alphaValue);
             }
         }
+        SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.01f);
         
 
 
