@@ -13,6 +13,10 @@
 		_Contrast ("Contrast", Float) = 1
 		_Saturation ("Saturation", Float) = 1
 		_Hue ("Hue", Float) = 0	
+		_SpeedX("SpeedX", Float) = 1
+		_TimeValue1("_TimeValue1", Float) = 0.1
+		_TimeValue2("_TimeValue2", Float) = 0.1
+		_TimeValue3("_TimeValue3", Float) = 0.1
 
 	}
 	SubShader
@@ -42,6 +46,10 @@
 			float _Contrast;
 			float _Saturation;
 			float _Hue;
+			float _SpeedX;
+			float _TimeValue1;
+			float _TimeValue2;
+			float _TimeValue3;
 
 			struct v2f
 			{
@@ -69,15 +77,15 @@
 			{
 				float2 uv = i.pos;
 				
-				uv.x += _Time.y * 0.025;
+				uv.x += _Time.y * _SpeedX;
 				// return float4(uv, 0, 1);
-				float r = tex2D(_MainTex, uv + _Time.xx * 0.0015).r;
-				float z = tex2D(_MainTex, r*0.25 + _Time.xy * 0.0125);
+				float r = tex2D(_MainTex, uv + _Time.xx * _TimeValue1).r;
+				float z = tex2D(_MainTex, r*0.25 + _Time.xy * _TimeValue2);
 				// float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
 				// z = pow(z + 0.25, 8);
-				float4 col = tex2D(_GradientTex, float2(z, _Time.x * 0.5));
+				float4 col = tex2D(_GradientTex, float2(z, _Time.x * _TimeValue3));
 				// float z2 = tex2D(_MainTex, z);
-				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * 0.5 - 0.667));
+				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * _TimeValue3 - 0.667));
 				col = lerp(col, col2, r);
 				col.a *= _Alpha;
 

@@ -9,24 +9,18 @@ public class DisableParticleSystemsOnStart : MonoBehaviour
 
     public ParticleSystem[] ParticleSystems;
 
-	void Start ()
+    void Start()
     {
         if (ParticleSystems == null || ParticleSystems.Length == 0)
             ParticleSystems = GetComponentsInChildren<ParticleSystem>(true);
 
-		if (ParticleSystems != null)
+        if (ParticleSystems != null)
         {
-            for(int i=0; i<ParticleSystems.Length; i++)
+            for (int i = 0; i < ParticleSystems.Length; i++)
             {
-                var emission = ParticleSystems[i].emission;
+                ParticleSystem.EmissionModule emission = ParticleSystems[i].emission;
                 emission.enabled = false;
-                //ParticleSystem.MainModule emit = ParticleSystems[i].main;
             }
         }
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
 }
