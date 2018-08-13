@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Text;
 using System;
+using ComeMillion;
 
 public class BuildUtils : MonoBehaviour
 {
@@ -21,15 +22,56 @@ public class BuildUtils : MonoBehaviour
     public StringBuilder theTextBuilder;
     public TimelineController theTimelineController;
 
+    public List<TileGroup> TileGroupsForDebugViewManagement;
+    public int TabState = 0;
+    private int NumTabStates = 2;
+
     void Start ()
     {
         theTextBuilder = new StringBuilder("...", 20);
-    }
-	
-	void Update ()
-    {
-        UpdateIngameText();
 
+        GetAllTileGroupsThatRequireDebugViewManagement();
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            TabState = (TabState + 1) % NumTabStates;
+            UpdateTileGroupsDebugView();
+        }
+
+        UpdateIngameText();
+    }
+
+
+    void GetAllTileGroupsThatRequireDebugViewManagement()
+    {
+        if (TileGroupsForDebugViewManagement == null || TileGroupsForDebugViewManagement.Count == 0)
+        {
+            TileGroupsForDebugViewManagement.Clear();
+
+            TileGroup[] tempTileGroupsForDebugViewManagement = FindObjectsOfType<TileGroup>();
+
+            if (tempTileGroupsForDebugViewManagement != null)
+            {
+                for (int i = 0; i < tempTileGroupsForDebugViewManagement.Length; i++)
+                {
+                    if (tempTileGroupsForDebugViewManagement[i] != null && tempTileGroupsForDebugViewManagement[i].ShowDebug)
+                        TileGroupsForDebugViewManagement.Add(tempTileGroupsForDebugViewManagement[i]);
+                }
+            }
+        }
+    }
+
+
+    void UpdateTileGroupsDebugView()
+    {
+        for (int i = 0; i < TileGroupsForDebugViewManagement.Count; i++)
+        {
+            if (TileGroupsForDebugViewManagement[i] != null)
+                TileGroupsForDebugViewManagement[i].ShowDebug = (TabState == 0);
+        }
     }
 
     void UpdateIngameText()
