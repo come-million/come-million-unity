@@ -80,7 +80,7 @@ public class BuildUtils : MonoBehaviour
             if (theTimelineController.CurrentTimelinePlaying < 0)
                 theTextBuilder.Append("Skin");
             else
-                theTextBuilder.Append(theTimelineController.CurrentTimelinePlaying.ToString("F2"));
+                theTextBuilder.Append(theTimelineController.CurrentTimelinePlaying.ToString());
             TextTimelineCurrent.text = theTextBuilder.ToString();
         }
     }

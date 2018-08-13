@@ -150,7 +150,9 @@ public class TimelineController : MonoBehaviour
 
         if (NumTimelinesPlaying <= 0 && TimerPlaystatePause > TimeToPause && !HoldTimelinesPlayback)
         {
-            Stop(CurrentTimelinePlaying);
+            if (CurrentTimelinePlaying >= 0 && CurrentTimelinePlaying < playableDirectors.Count)
+                Stop(CurrentTimelinePlaying);
+
             Play(NextTimelineToPlay);
             CurrentTimelinePlaying = NextTimelineToPlay;
             HoldTimelinesPlayback = true;
