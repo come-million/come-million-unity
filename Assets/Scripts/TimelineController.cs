@@ -32,6 +32,9 @@ public class TimelineController : MonoBehaviour
 
     public bool DebugView = false;
 
+    private string SkinName = "Skin";
+    private string SkinNameError = "Skin Name Error!";
+    private string TimelineNameSuffix = "Timeline";
 
     void Start()
     {
@@ -51,6 +54,29 @@ public class TimelineController : MonoBehaviour
 
         SkinBrightnessValue = 0.0f;
         UpdateSkinBrightness(0.0f);
+    }
+
+
+    const int timelineNamePrefixLength = 2;
+    public string GetCurrentTimelineName()
+    {
+        int currentTimeline = GetCurrentTimeline();
+        if (currentTimeline < 0)
+            return SkinName;
+
+        if (currentTimeline >= timelines.Count)
+            return SkinNameError;
+
+        
+        return timelines[currentTimeline].name.Remove(timelines[currentTimeline].name.IndexOf(TimelineNameSuffix) - timelineNamePrefixLength, TimelineNameSuffix.Length + timelineNamePrefixLength);
+    }
+
+    public int GetCurrentTimeline()
+    {
+        if (GetNumTimelinesPlaying() <= 0)
+            return -1;
+
+        return CurrentTimelinePlaying;
     }
 
     public int GetNumTimelinesPlaying()
@@ -109,7 +135,7 @@ public class TimelineController : MonoBehaviour
     {
         if (SkinMats != null && SkinMats.Length > 0)
         {
-            SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.005f);
+            SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.03f);
             for (int i = 0; i < SkinMats.Length; i++)
             {
                 float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, SkinBrightnessValue);

@@ -119,10 +119,7 @@ public class BuildUtils : MonoBehaviour
         if (TextTimelineCurrent != null && theTextBuilder != null && theTimelineController != null)
         {
             theTextBuilder.Remove(0, theTextBuilder.Length);
-            if (theTimelineController.CurrentTimelinePlaying < 0)
-                theTextBuilder.Append("Skin");
-            else
-                theTextBuilder.Append(theTimelineController.CurrentTimelinePlaying.ToString());
+            theTextBuilder.Append(theTimelineController.GetCurrentTimelineName());
             TextTimelineCurrent.text = theTextBuilder.ToString();
         }
     }
