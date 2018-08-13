@@ -16,6 +16,7 @@ public class TimelineController : MonoBehaviour
     public float TimerPlaystatePlay = 0.0f;
     public float TimerTotal = 0.0f;
 
+    public int CurrentTimelinePlaying = -1;
     public int NextTimelineToPlay = 0;
 
     public Material[] SkinMats;
@@ -25,6 +26,11 @@ public class TimelineController : MonoBehaviour
     public float SkinBrightnessMin = 0.05f;
     public float SkinBrightnessMax = 0.3f;
     public float PulseTimeScale = 1.0f;
+
+    public float DebugTime = 0.0f;
+    public bool HoldTimelinesPlayback = false;
+
+    public bool DebugView = false;
 
 
     void Start()
@@ -37,8 +43,14 @@ public class TimelineController : MonoBehaviour
                 playableDirectors.AddRange(directorArray);
 
             foreach (PlayableDirector dir in playableDirectors)
+            {
+                dir.time = 0.0f;                     
                 dir.Stop();
+            }
         }
+
+        SkinBrightnessValue = 0.0f;
+        UpdateSkinBrightness();
     }
 
     public int GetNumTimelinesPlaying()
@@ -49,7 +61,8 @@ public class TimelineController : MonoBehaviour
             PlayableDirector currentDir = playableDirectors[i];
             //PlayState timelineState = currentDir.state;
             //if (timelineState == PlayState.Playing)
-            if (currentDir.time > 0.0f)
+            //    numCurrentlyPlaying++;
+            if (currentDir.time > 0.0f && currentDir.time < currentDir.duration)
                 numCurrentlyPlaying++;
         }
 
@@ -61,13 +74,18 @@ public class TimelineController : MonoBehaviour
         for (int i = 0; i < playableDirectors.Count; i++)
         {
             if (index < 0 || index == i)
-            {
                 playableDirectors[i].Play();
-                TimerPlaystatePause = 0.0f;
-            }
         }
     }
 
+    public void Stop(int index = -1)
+    {
+        for (int i = 0; i < playableDirectors.Count; i++)
+        {
+            if (index < 0 || index == i)
+                playableDirectors[i].Stop();
+        }
+    }
 
     //public void PlayFromTimelines(int index)
     //{
@@ -84,7 +102,25 @@ public class TimelineController : MonoBehaviour
 
     //    playableDirectors[0].Play(selectedAsset);
     //}
-    
+
+
+
+    public void UpdateSkinBrightness()
+    {
+        if (SkinMats != null && SkinMats.Length > 0)
+        {
+            //SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.005f);
+            for (int i = 0; i < SkinMats.Length; i++)
+            {
+                float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, SkinBrightnessValue);
+                //if (i < SkinMats.Length - 1)
+                //    alphaValue += 0.1f * alphaValue * Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * (float)(i+1) * 2.0f * Mathf.PI);
+                SkinMats[i].SetFloat("_Alpha", alphaValue);
+                if (DebugView)
+                    Debug.LogWarning("SkinBrightnessValue: " + SkinBrightnessValue.ToString());
+            }
+        }
+    }
 
     private void Update()
     {
@@ -105,27 +141,20 @@ public class TimelineController : MonoBehaviour
         else
         {
             TimerPlaystatePlay += Time.deltaTime;
+            HoldTimelinesPlayback = false;
             TimerPlaystatePause = 0.0f;
             SkinBrightnessValue = Mathf.Clamp01(1.0f - Mathf.Clamp01(TimerPlaystatePlay / TimeForSkinTransition));
         }
 
-        if (SkinMats != null && SkinMats.Length > 0)
-        {
-            for (int i = 0; i < SkinMats.Length; i++)
-            {
-                float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, SkinBrightnessValue);
-                if (i < SkinMats.Length - 1)
-                    alphaValue += 0.2f * alphaValue * Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * (float)(i+1) * 2.0f * Mathf.PI);
-                SkinMats[i].SetFloat("_Alpha", alphaValue);
-            }
-        }
-        SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.01f);
-        
+        UpdateSkinBrightness();        
 
 
-        if (NumTimelinesPlaying <= 0 && TimerPlaystatePause > TimeToPause)
+        if (NumTimelinesPlaying <= 0 && TimerPlaystatePause > TimeToPause && !HoldTimelinesPlayback)
         {
+            Stop(CurrentTimelinePlaying);
             Play(NextTimelineToPlay);
+            CurrentTimelinePlaying = NextTimelineToPlay;
+            HoldTimelinesPlayback = true;
             NextTimelineToPlay = (NextTimelineToPlay + 1) % playableDirectors.Count;
         }
     }

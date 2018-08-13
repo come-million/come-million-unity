@@ -1,4 +1,4 @@
-﻿Shader "Custom/NoiseDissolve"
+﻿Shader "Custom/NoiseDissolveAdditive"
 {
 	Properties
 	{
@@ -24,7 +24,7 @@
 		Cull Off
 		// ZTest Off ZWrite Off
 		Blend SrcAlpha OneMinusSrcAlpha
-		// Blend One One
+		//Blend One One
 
 		Pass
 		{
@@ -80,9 +80,8 @@
 				//uv.x += _Time.y * _SpeedX;
 				// return float4(uv, 0, 1);
 				float r = tex2D(_MainTex, uv + _Time.xx * _TimeValue1).r;
-				//float z = tex2D(_MainTex, r*0.25 + _Time.xy * _TimeValue2);
+				float z = tex2D(_MainTex, r*0.25 + _Time.xy * _TimeValue2);
 				//float z = tex2D(_MainTex, uv * 2.0f + _Time.xy * _TimeValue2);
-				float z = tex2D(_MainTex, uv * 2.0f + _TimeValue2);
 				// float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
 				// z = pow(z + 0.25, 8);
 				float4 col = tex2D(_GradientTex, float2(z, _Time.x * _TimeValue3));
@@ -105,3 +104,8 @@
 		}
 	}
 }
+// Gamma - 1
+// Brightness - 0
+// Contrast - 1
+// Saturation - 1
+// Hue - 0

@@ -40,7 +40,7 @@ public class Heartbeat : MonoBehaviour
                 if (i <= 2)
                     main.startSpeed = RadiusSpeedValue * (float)(i + 1) * CurrentRadius;
                 else
-                    main.startSpeed = RadiusSpeedValue * 3.0f * CurrentRadius;
+                    main.startSpeed = RadiusSpeedValue * 1.5f * CurrentRadius;
             }
         }
     }

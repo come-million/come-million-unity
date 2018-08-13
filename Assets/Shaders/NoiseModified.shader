@@ -1,4 +1,4 @@
-﻿Shader "Custom/NoiseDissolve"
+﻿Shader "Custom/NoiseModified"
 {
 	Properties
 	{
@@ -17,13 +17,15 @@
 		_TimeValue1("_TimeValue1", Float) = 0.1
 		_TimeValue2("_TimeValue2", Float) = 0.1
 		_TimeValue3("_TimeValue3", Float) = 0.1
+		_TimeValue4("_TimeValue4", Float) = 0.1
 
 	}
 	SubShader
 	{
 		Cull Off
 		// ZTest Off ZWrite Off
-		Blend SrcAlpha OneMinusSrcAlpha
+		//Blend SrcAlpha OneMinusSrcAlpha
+		Blend SrcAlpha OneMinusSrcColor
 		// Blend One One
 
 		Pass
@@ -50,6 +52,7 @@
 			float _TimeValue1;
 			float _TimeValue2;
 			float _TimeValue3;
+			float _TimeValue4;
 
 			struct v2f
 			{
@@ -79,23 +82,32 @@
 				
 				//uv.x += _Time.y * _SpeedX;
 				// return float4(uv, 0, 1);
-				float r = tex2D(_MainTex, uv + _Time.xx * _TimeValue1).r;
+				float r = tex2D(_MainTex, uv + _Time.x * _TimeValue1).r;
 				//float z = tex2D(_MainTex, r*0.25 + _Time.xy * _TimeValue2);
 				//float z = tex2D(_MainTex, uv * 2.0f + _Time.xy * _TimeValue2);
-				float z = tex2D(_MainTex, uv * 2.0f + _TimeValue2);
-				// float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0625);
+				//float z = tex2D(_MainTex, uv * 2.0f + _TimeValue2);
+				float z = tex2D(_MainTex, r.xx + _Time.xy * 0.0125);
 				// z = pow(z + 0.25, 8);
 				float4 col = tex2D(_GradientTex, float2(z, _Time.x * _TimeValue3));
 				// float z2 = tex2D(_MainTex, z);
 				float4 col2 = tex2D(_GradientTex, float2(z, _Time.x * _TimeValue3 - 0.667));
 				col = lerp(col, col2, r);
+				//float brightnessWave = 0.95f + 0.05f * sin(0.2f * _Time.xx * 2.0f + _TimeValue4 * uv.y);
+				//col *= brightnessWave;
 				col.a *= _Alpha;
 
 				col.rgb = pow(col.rgb, _Gamma);
 				col.rgb = (col.rgb - 0.5) * _Contrast + 0.5 + _Brightness;
-				col.rgb = lerp(dot(col.rgb, float3(0.2126, 0.7152, 0.0722)), col.rgb, _Saturation);
+				//float saturationWave = 0.5f * _Saturation * sin(10.0f * _Time.xx * 3.14 * r);
+				//float currentSaturation = fmod(_Saturation + saturationWave, 1);
+				float currentSaturation = _Saturation;
+				col.rgb = lerp(dot(col.rgb, float3(0.2126, 0.7152, 0.0722)), col.rgb, currentSaturation);
 				col.rgb = RGBtoHSV(col.rgb);
 				col.r = fmod(col.r + _Hue, 1);
+				
+				col.r = fmod(col.r + r, 1);
+				float brightnessWave = 0.5f + 0.5f * sin(_Time.x * r * uv.x * _TimeValue4) * cos(_Time.x * r * uv.y * _TimeValue4);
+				col.a *= saturate(brightnessWave);
 				col.rgb = HSVtoRGB(col.rgb);
 
 				//return (col * _Tint).rgba;
