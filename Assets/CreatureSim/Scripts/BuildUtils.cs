@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Text;
+using System;
 
 public class BuildUtils : MonoBehaviour
 {
@@ -11,29 +12,76 @@ public class BuildUtils : MonoBehaviour
 
     private float m_DeltaVelocity = 0.0f;
 
-    public Text FPSText;
+    public Text TextFPS;
+    public Text TextTimeTotal;
+    public Text TextTimePlay;
+    public Text TextTimePause;
+    public Text TextTimelineCurrent;
 
-    public StringBuilder FPSBuilder;
+    public StringBuilder theTextBuilder;
+    public TimelineController theTimelineController;
 
     void Start ()
     {
-        if (FPSText == null)
-            FPSText = transform.GetComponent<Text>();
-
-        FPSBuilder = new StringBuilder("...", 5);
+        theTextBuilder = new StringBuilder("...", 20);
     }
 	
 	void Update ()
+    {
+        UpdateIngameText();
+
+    }
+
+    void UpdateIngameText()
     {
         // frame rate calculation
         m_SmoothDeltaTime = BuildUtils.SmoothDamp(m_SmoothDeltaTime, Time.deltaTime, ref m_DeltaVelocity, 0.7f, Mathf.Infinity, Time.deltaTime);
         FPS = m_SmoothDeltaTime > 0.0f ? (1.0f / m_SmoothDeltaTime) : 0.0f;
 
-        if (FPSText != null && FPSBuilder != null)
+        if (TextFPS != null && theTextBuilder != null)
         {
-            FPSBuilder.Remove(0, FPSBuilder.Length);
-            FPSBuilder.Append(Mathf.RoundToInt(FPS));
-            FPSText.text = FPSBuilder.ToString();
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            theTextBuilder.Append(Mathf.RoundToInt(FPS));
+            TextFPS.text = theTextBuilder.ToString();
+        }
+
+
+        if (TextTimeTotal != null && theTextBuilder != null && theTimelineController != null)
+        {
+            TimeSpan time = TimeSpan.FromSeconds(theTimelineController.TimerTotal);
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+
+            string answer = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                time.Hours,
+                time.Minutes,
+                time.Seconds);
+            //time.TotalHours.ToString("F0") + ":" + time.TotalMinutes.ToString("F0") + ":" + time.Seconds.ToString("F0")
+            theTextBuilder.Append(answer);
+            TextTimeTotal.text = theTextBuilder.ToString();
+        }
+
+        if (TextTimePlay != null && theTextBuilder != null && theTimelineController != null)
+        {
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            theTextBuilder.Append(theTimelineController.TimerPlaystatePlay.ToString("F2"));
+            TextTimePlay.text = theTextBuilder.ToString();
+        }
+
+        if (TextTimePause != null && theTextBuilder != null && theTimelineController != null)
+        {
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            theTextBuilder.Append(theTimelineController.TimerPlaystatePause.ToString("F2"));
+            TextTimePause.text = theTextBuilder.ToString();
+        }
+
+        if (TextTimelineCurrent != null && theTextBuilder != null && theTimelineController != null)
+        {
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            if (theTimelineController.CurrentTimelinePlaying < 0)
+                theTextBuilder.Append("Skin");
+            else
+                theTextBuilder.Append(theTimelineController.CurrentTimelinePlaying.ToString("F2"));
+            TextTimelineCurrent.text = theTextBuilder.ToString();
         }
     }
 

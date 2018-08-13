@@ -50,7 +50,7 @@ public class TimelineController : MonoBehaviour
         }
 
         SkinBrightnessValue = 0.0f;
-        UpdateSkinBrightness();
+        UpdateSkinBrightness(0.0f);
     }
 
     public int GetNumTimelinesPlaying()
@@ -105,11 +105,11 @@ public class TimelineController : MonoBehaviour
 
 
 
-    public void UpdateSkinBrightness()
+    public void UpdateSkinBrightness(float prevSkinBrightnessValue)
     {
         if (SkinMats != null && SkinMats.Length > 0)
         {
-            //SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.005f);
+            SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.005f);
             for (int i = 0; i < SkinMats.Length; i++)
             {
                 float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, SkinBrightnessValue);
@@ -145,8 +145,7 @@ public class TimelineController : MonoBehaviour
             TimerPlaystatePause = 0.0f;
             SkinBrightnessValue = Mathf.Clamp01(1.0f - Mathf.Clamp01(TimerPlaystatePlay / TimeForSkinTransition));
         }
-
-        UpdateSkinBrightness();        
+        UpdateSkinBrightness(prevSkinBrightnessValue);        
 
 
         if (NumTimelinesPlaying <= 0 && TimerPlaystatePause > TimeToPause && !HoldTimelinesPlayback)
