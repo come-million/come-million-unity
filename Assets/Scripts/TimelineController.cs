@@ -27,14 +27,17 @@ public class TimelineController : MonoBehaviour
     public float SkinBrightnessMax = 0.3f;
     public float PulseTimeScale = 1.0f;
 
-    public float DebugTime = 0.0f;
-    public bool HoldTimelinesPlayback = false;
+    public Camera ProjectionCam1;
+    public Camera ProjectionCam2;
 
-    public bool DebugView = false;
+    public bool HoldTimelinesPlayback = false;
 
     private string SkinName = "Skin";
     private string SkinNameError = "Skin Name Error!";
     private string TimelineNameSuffix = "Timeline";
+
+    private const int timelineNamePrefixLength = 2;
+
 
     void Start()
     {
@@ -52,12 +55,12 @@ public class TimelineController : MonoBehaviour
             }
         }
 
-        SkinBrightnessValue = 0.0f;
+        SkinBrightnessValue = 1.0f;
         UpdateSkinBrightness(0.0f);
     }
 
 
-    const int timelineNamePrefixLength = 2;
+    
     public string GetCurrentTimelineName()
     {
         int currentTimeline = GetCurrentTimeline();
@@ -135,16 +138,52 @@ public class TimelineController : MonoBehaviour
     {
         if (SkinMats != null && SkinMats.Length > 0)
         {
-            SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.03f);
+            SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.1f);
             for (int i = 0; i < SkinMats.Length; i++)
             {
-                float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, SkinBrightnessValue);
-                //if (i < SkinMats.Length - 1)
-                //    alphaValue += 0.1f * alphaValue * Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * (float)(i+1) * 2.0f * Mathf.PI);
+                float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, Mathf.Pow(SkinBrightnessValue, 2.0f));
+                if (i < SkinMats.Length - 1)
+                    alphaValue += 0.1f * alphaValue * Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * (float)(i + 1) * 2.0f * Mathf.PI);
                 SkinMats[i].SetFloat("_Alpha", alphaValue);
-                if (DebugView)
-                    Debug.LogWarning("SkinBrightnessValue: " + SkinBrightnessValue.ToString());
             }
+        }
+    }
+
+    private void UpdateLayersVisibility()
+    {
+        int currentTimeline = GetCurrentTimeline();
+
+        if (!timelineIsPlaying)//currentTimeline < 0)
+        {
+            float newAlpha = Mathf.Lerp(0.7f, 0.0f, SkinBrightnessValue);
+
+            float newAlpha1 = Mathf.Min(newAlpha, ProjectionCam1.backgroundColor.a);
+            if (ProjectionCam1 != null)
+                ProjectionCam1.backgroundColor = new Color(ProjectionCam1.backgroundColor.r, ProjectionCam1.backgroundColor.g, ProjectionCam1.backgroundColor.b, newAlpha1);
+
+            float newAlpha2 = Mathf.Min(newAlpha, ProjectionCam2.backgroundColor.a);
+            if (ProjectionCam2 != null)
+                ProjectionCam2.backgroundColor = new Color(ProjectionCam2.backgroundColor.r, ProjectionCam2.backgroundColor.g, ProjectionCam2.backgroundColor.b, newAlpha2);
+        }
+        else if(currentTimeline == 0) // projection cam2
+        {
+            if (ProjectionCam2 != null)
+            {
+                float newAlpha = Mathf.Lerp(0.7f, 0.0f, SkinBrightnessValue);
+                ProjectionCam2.backgroundColor = new Color(ProjectionCam2.backgroundColor.r, ProjectionCam2.backgroundColor.g, ProjectionCam2.backgroundColor.b, newAlpha);
+            }
+        }
+        else if (currentTimeline == 1 || currentTimeline == 2) // projection cam1
+        {
+            if (ProjectionCam1 != null)
+            {
+                float newAlpha = Mathf.Lerp(0.7f, 0.0f, SkinBrightnessValue);
+                ProjectionCam1.backgroundColor = new Color(ProjectionCam1.backgroundColor.r, ProjectionCam1.backgroundColor.g, ProjectionCam1.backgroundColor.b, newAlpha);
+            }
+        }
+        else
+        {
+            Debug.Assert(true, "Wrong timeline index!");
         }
     }
 
@@ -184,5 +223,7 @@ public class TimelineController : MonoBehaviour
             HoldTimelinesPlayback = true;
             NextTimelineToPlay = (NextTimelineToPlay + 1) % playableDirectors.Count;
         }
+
+        UpdateLayersVisibility();
     }
 }
