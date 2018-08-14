@@ -21,19 +21,15 @@ namespace ComeMillion
 
         [NonSerialized]
         private List<Color32[]> tilesPixels;
-        private MeshRenderer[] tileRenderers;
 
         [System.Serializable]
         public class TextureEvent : UnityEvent<Texture> { }
 
         public TextureEvent OnTextureReady;
 
-        public bool ShowDebug = true;
-
         void Awake()
         {
             tiles = GetComponentsInChildren<Tile>();
-            tileRenderers = GetComponentsInChildren<MeshRenderer>();
 
             if (rect.size == Vector2Int.zero)
             {
@@ -49,6 +45,9 @@ namespace ComeMillion
             };
             rt.Create();
             OnTextureReady.Invoke(rt);
+
+            // Array.ForEach(tiles, t => t.rt = rt);
+            // tiles = GetComponentsInChildren<Tile>().Where(t => t.isActiveAndEnabled).ToArray();
 
             tex = new Texture2D(rect.width, rect.height, TextureFormat.ARGB32, true, false)
             {
@@ -138,12 +137,10 @@ namespace ComeMillion
                         t.rt = rt;
                         t.material = m;
                         t.material.SetVector(groupProp, new Vector4(rect.x, rect.y, rect.width, rect.height));
-                        t.Render();
+                        if (t.isActiveAndEnabled)
+                            t.Render();
                     }
                 }
-
-                foreach (var t in tileRenderers)
-                    t.enabled = ShowDebug;
 
                 RenderTexture.active = null;
 
@@ -185,12 +182,15 @@ namespace ComeMillion
             for (int i = 0; i < tiles.Length; i++)
             {
                 var t = tiles[i];
-                RectInt r1 = t.rect;
-                var c = tilesPixels[i];
-                CopyRect(colors, c, r1);
-                // t.tex.SetPixels32(c);
-                // t.tex.Apply();
-                client.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
+                if (t.isActiveAndEnabled)
+                {
+                    RectInt r1 = t.rect;
+                    var c = tilesPixels[i];
+                    CopyRect(colors, c, r1);
+                    // t.tex.SetPixels32(c);
+                    // t.tex.Apply();
+                    client.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
+                }
             }
 
             var p = tex.GetPixels32(tex.mipmapCount - 1).Take(1).ToArray();

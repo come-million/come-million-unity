@@ -22,15 +22,12 @@ public class BuildUtils : MonoBehaviour
     public StringBuilder theTextBuilder;
     public TimelineController theTimelineController;
 
-    public List<TileGroup> TileGroupsForDebugViewManagement;
     public int TabState = 0;
     private int NumTabStates = 2;
 
     void Start ()
     {
         theTextBuilder = new StringBuilder("...", 20);
-
-        GetAllTileGroupsThatRequireDebugViewManagement();
     }
 
     void Update()
@@ -38,46 +35,15 @@ public class BuildUtils : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             TabState = (TabState + 1) % NumTabStates;
-            UpdateTileGroupsDebugView();
         }
 
         UpdateIngameText();
     }
 
-
-    void GetAllTileGroupsThatRequireDebugViewManagement()
-    {
-        if (TileGroupsForDebugViewManagement == null || TileGroupsForDebugViewManagement.Count == 0)
-        {
-            TileGroupsForDebugViewManagement.Clear();
-
-            TileGroup[] tempTileGroupsForDebugViewManagement = FindObjectsOfType<TileGroup>();
-
-            if (tempTileGroupsForDebugViewManagement != null)
-            {
-                for (int i = 0; i < tempTileGroupsForDebugViewManagement.Length; i++)
-                {
-                    if (tempTileGroupsForDebugViewManagement[i] != null && tempTileGroupsForDebugViewManagement[i].ShowDebug)
-                        TileGroupsForDebugViewManagement.Add(tempTileGroupsForDebugViewManagement[i]);
-                }
-            }
-        }
-    }
-
-
-    void UpdateTileGroupsDebugView()
-    {
-        for (int i = 0; i < TileGroupsForDebugViewManagement.Count; i++)
-        {
-            if (TileGroupsForDebugViewManagement[i] != null)
-                TileGroupsForDebugViewManagement[i].ShowDebug = (TabState == 0);
-        }
-    }
-
     void UpdateIngameText()
     {
         // frame rate calculation
-        m_SmoothDeltaTime = BuildUtils.SmoothDamp(m_SmoothDeltaTime, Time.deltaTime, ref m_DeltaVelocity, 0.7f, Mathf.Infinity, Time.deltaTime);
+        m_SmoothDeltaTime = BuildUtils.SmoothDamp(m_SmoothDeltaTime, Time.unscaledDeltaTime, ref m_DeltaVelocity, 0.7f, Mathf.Infinity, Time.unscaledDeltaTime);
         FPS = m_SmoothDeltaTime > 0.0f ? (1.0f / m_SmoothDeltaTime) : 0.0f;
 
         if (TextFPS != null && theTextBuilder != null)
