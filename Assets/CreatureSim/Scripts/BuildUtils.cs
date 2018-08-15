@@ -18,6 +18,7 @@ public class BuildUtils : MonoBehaviour
     public Text TextTimePlay;
     public Text TextTimePause;
     public Text TextTimelineCurrent;
+    public Text TextTimeScale;
 
     public StringBuilder theTextBuilder;
     public TimelineController theTimelineController;
@@ -28,6 +29,7 @@ public class BuildUtils : MonoBehaviour
     void Start()
     {
         theTextBuilder = new StringBuilder("...", 20);
+        SetTimeScale(1.0f);
     }
 
     void Update()
@@ -119,5 +121,12 @@ public class BuildUtils : MonoBehaviour
     public void SetTimeScale(float t)
     {
         Time.timeScale = t;
+
+        if (TextTimeScale != null && theTextBuilder != null)
+        {
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            theTextBuilder.Append(Time.timeScale.ToString("F2"));
+            TextTimeScale.text = theTextBuilder.ToString();
+        }
     }
 }
