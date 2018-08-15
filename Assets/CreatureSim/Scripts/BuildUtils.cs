@@ -25,7 +25,7 @@ public class BuildUtils : MonoBehaviour
     public int TabState = 0;
     private int NumTabStates = 2;
 
-    void Start ()
+    void Start()
     {
         theTextBuilder = new StringBuilder("...", 20);
     }
@@ -58,13 +58,7 @@ public class BuildUtils : MonoBehaviour
         {
             TimeSpan time = TimeSpan.FromSeconds(theTimelineController.TimerTotal);
             theTextBuilder.Remove(0, theTextBuilder.Length);
-
-            string answer = string.Format("{0:D2}:{1:D2}:{2:D2}",
-                time.Hours,
-                time.Minutes,
-                time.Seconds);
-            //time.TotalHours.ToString("F0") + ":" + time.TotalMinutes.ToString("F0") + ":" + time.Seconds.ToString("F0")
-            theTextBuilder.Append(answer);
+            theTextBuilder.Append(string.Format("{0:hh\\:mm\\:ss\\:fff}", time));
             TextTimeTotal.text = theTextBuilder.ToString();
         }
 
@@ -120,5 +114,10 @@ public class BuildUtils : MonoBehaviour
         }
 
         return result;
+    }
+
+    public void SetTimeScale(float t)
+    {
+        Time.timeScale = t;
     }
 }
