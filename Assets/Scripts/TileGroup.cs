@@ -27,6 +27,8 @@ namespace ComeMillion
 
         public TextureEvent OnTextureReady;
 
+        bool rendering;
+
         void Awake()
         {
             tiles = GetComponentsInChildren<Tile>();
@@ -107,6 +109,8 @@ namespace ComeMillion
             // FillCommandBuffer(cmd);
             // var mats = new Material[materials.Length];
             // Array.Copy(materials, mats, materials.Length);
+            var tgs = FindObjectsOfType<TileGroup>();
+            var w1 = new WaitWhile(() => tgs.All(t => t.rendering));
 
             while (true)
             {
@@ -125,18 +129,22 @@ namespace ComeMillion
                 // }
                 // Graphics.ExecuteCommandBuffer(cmd);
 
+                yield return w;
+                rendering = true;
+
                 RenderTexture.active = rt;
                 GL.Clear(true, true, Color.clear);
 
+                var g = new Vector4(rect.x, rect.y, rect.width, rect.height);
                 foreach (var m in materials)
                 {
                     if (m == null)
                         continue;
+                    m.SetVector(groupProp, g);
                     foreach (var t in tiles)
                     {
                         t.rt = rt;
                         t.material = m;
-                        t.material.SetVector(groupProp, new Vector4(rect.x, rect.y, rect.width, rect.height));
                         if (t.isActiveAndEnabled)
                             t.Render();
                     }
@@ -144,11 +152,14 @@ namespace ComeMillion
 
                 RenderTexture.active = null;
 
+
                 // #if UNITY_EDITOR
                 //             UnityEditor.EditorUtility.SetDirty(rt);
                 //             UnityEditor.SceneView.RepaintAll();
                 // #endif
-                yield return w;
+
+                rendering = false;
+                yield return w1;
 
                 ReadAndSend();
             }
