@@ -25,7 +25,7 @@ public class TimelineController : MonoBehaviour
     public float TimeForSkinTransition = 10.0f;
     public float SkinBrightnessMin = 0.05f;
     public float SkinBrightnessMax = 0.3f;
-    public float PulseTimeScale = 1.0f;
+    //public float PulseTimeScale = 1.0f;
 
     public Camera ProjectionCam1;
     public Camera ProjectionCam2;
@@ -142,8 +142,11 @@ public class TimelineController : MonoBehaviour
             for (int i = 0; i < SkinMats.Length; i++)
             {
                 float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, Mathf.Pow(SkinBrightnessValue, 2.0f));
-                if (i < SkinMats.Length - 1)
-                    alphaValue += 0.1f * alphaValue * Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * (float)(i + 1) * 2.0f * Mathf.PI);
+                //if (i < SkinMats.Length - 1)
+                //{
+                //    float differntTimedValuePerSkinMat = 1.0f + 0.1f * (float)i;
+                //    alphaValue = alphaValue * (0.3f + 0.7f) * Mathf.Abs(Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * differntTimedValuePerSkinMat * 2.0f * Mathf.PI));
+                //}
                 SkinMats[i].SetFloat("_Alpha", alphaValue);
             }
         }

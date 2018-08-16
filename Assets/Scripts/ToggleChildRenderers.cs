@@ -11,5 +11,4 @@ public class ToggleChildRenderers : MonoBehaviour
             System.Array.ForEach(GetComponentsInChildren<MeshRenderer>(), m => m.enabled = value);
         }
     }
-
 }

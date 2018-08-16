@@ -60,7 +60,11 @@ public class BuildUtils : MonoBehaviour
         {
             TimeSpan time = TimeSpan.FromSeconds(theTimelineController.TimerTotal);
             theTextBuilder.Remove(0, theTextBuilder.Length);
-            theTextBuilder.Append(string.Format("{0:hh\\:mm\\:ss\\:fff}", time));
+            //theTextBuilder.Append(string.Format("{0:hh\\:mm\\:ss\\:f}", time)); // this works well only for time-spans under 24 hours :) 
+            int hours = (int)time.TotalHours;
+            int minutes = time.Minutes;
+            int seconds = time.Seconds;
+            theTextBuilder.Append(hours.ToString("D2") + ":" + minutes.ToString("D2") + ":" + seconds.ToString("D2"));
             TextTimeTotal.text = theTextBuilder.ToString();
         }
 
