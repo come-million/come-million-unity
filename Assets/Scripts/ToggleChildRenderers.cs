@@ -12,9 +12,10 @@ public class ToggleChildRenderers : MonoBehaviour
         }
     }
 
-    public bool Initial = true;
+    //public bool Initial = true;
 
-    void Awake() {
-        ChildrenEnabled = Initial;
-    }
+    //void Awake()
+    //{
+    //    ChildrenEnabled = Initial;
+    //}
 }
