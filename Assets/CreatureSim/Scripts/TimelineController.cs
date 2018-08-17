@@ -21,6 +21,8 @@ public class TimelineController : MonoBehaviour
 
     public Material[] SkinMats;
     public float SkinBrightnessValue = 0.0f;
+    public float ProjCamsMaxAlpha = 0.8f;
+    public float ProjCamsMinAlpha = 0.1f;
     public float TimeToPause = 15.0f;
     public float TimeForSkinTransition = 10.0f;
     public float SkinBrightnessMin = 0.05f;
@@ -56,7 +58,7 @@ public class TimelineController : MonoBehaviour
         }
 
         SkinBrightnessValue = 1.0f;
-        UpdateSkinBrightness(0.0f);
+        //UpdateSkinBrightness(0.0f);
     }
 
 
@@ -136,20 +138,20 @@ public class TimelineController : MonoBehaviour
 
     public void UpdateSkinBrightness(float prevSkinBrightnessValue)
     {
-        if (SkinMats != null && SkinMats.Length > 0)
-        {
-            SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.1f);
-            for (int i = 0; i < SkinMats.Length; i++)
-            {
-                float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, Mathf.Pow(SkinBrightnessValue, 2.0f));
-                //if (i < SkinMats.Length - 1)
-                //{
-                //    float differntTimedValuePerSkinMat = 1.0f + 0.1f * (float)i;
-                //    alphaValue = alphaValue * (0.3f + 0.7f) * Mathf.Abs(Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * differntTimedValuePerSkinMat * 2.0f * Mathf.PI));
-                //}
-                SkinMats[i].SetFloat("_Alpha", alphaValue);
-            }
-        }
+        ////if (SkinMats != null && SkinMats.Length > 0)
+        ////{
+        ////    SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.1f);
+        ////    for (int i = 0; i < SkinMats.Length; i++)
+        ////    {
+        ////        float alphaValue = Mathf.Lerp(SkinBrightnessMin, SkinBrightnessMax, Mathf.Pow(SkinBrightnessValue, 2.0f));
+        ////        //if (i < SkinMats.Length - 1)
+        ////        //{
+        ////        //    float differntTimedValuePerSkinMat = 1.0f + 0.1f * (float)i;
+        ////        //    alphaValue = alphaValue * (0.3f + 0.7f) * Mathf.Abs(Mathf.Sin(PulseTimeScale * Time.timeSinceLevelLoad * differntTimedValuePerSkinMat * 2.0f * Mathf.PI));
+        ////        //}
+        ////        SkinMats[i].SetFloat("_Alpha", alphaValue);
+        ////    }
+        ////}
     }
 
     private void UpdateLayersVisibility()
@@ -158,7 +160,7 @@ public class TimelineController : MonoBehaviour
 
         if (!timelineIsPlaying)//currentTimeline < 0)
         {
-            float newAlpha = Mathf.Lerp(0.7f, 0.0f, SkinBrightnessValue);
+            float newAlpha = Mathf.Lerp(ProjCamsMaxAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
 
             float newAlpha1 = Mathf.Min(newAlpha, ProjectionCam1.backgroundColor.a);
             if (ProjectionCam1 != null)
@@ -172,7 +174,7 @@ public class TimelineController : MonoBehaviour
         {
             if (ProjectionCam2 != null)
             {
-                float newAlpha = Mathf.Lerp(0.7f, 0.0f, SkinBrightnessValue);
+                float newAlpha = Mathf.Lerp(ProjCamsMaxAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
                 ProjectionCam2.backgroundColor = new Color(ProjectionCam2.backgroundColor.r, ProjectionCam2.backgroundColor.g, ProjectionCam2.backgroundColor.b, newAlpha);
             }
         }
@@ -180,7 +182,7 @@ public class TimelineController : MonoBehaviour
         {
             if (ProjectionCam1 != null)
             {
-                float newAlpha = Mathf.Lerp(0.7f, 0.0f, SkinBrightnessValue);
+                float newAlpha = Mathf.Lerp(ProjCamsMaxAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
                 ProjectionCam1.backgroundColor = new Color(ProjectionCam1.backgroundColor.r, ProjectionCam1.backgroundColor.g, ProjectionCam1.backgroundColor.b, newAlpha);
             }
         }
@@ -213,7 +215,7 @@ public class TimelineController : MonoBehaviour
             TimerPlaystatePause = 0.0f;
             SkinBrightnessValue = Mathf.Clamp01(1.0f - Mathf.Clamp01(TimerPlaystatePlay / TimeForSkinTransition));
         }
-        UpdateSkinBrightness(prevSkinBrightnessValue);        
+        //UpdateSkinBrightness(prevSkinBrightnessValue);        
 
 
         if (NumTimelinesPlaying <= 0 && TimerPlaystatePause > TimeToPause && !HoldTimelinesPlayback)
