@@ -170,7 +170,7 @@ public class TimelineController : MonoBehaviour
             if (ProjectionCam2 != null)
                 ProjectionCam2.backgroundColor = new Color(ProjectionCam2.backgroundColor.r, ProjectionCam2.backgroundColor.g, ProjectionCam2.backgroundColor.b, newAlpha2);
         }
-        else if(currentTimeline == 0 || currentTimeline == 1) // projection cam2
+        else if(currentTimeline == 2 || currentTimeline == 3 || currentTimeline == 5) // projection cam2
         {
             if (ProjectionCam2 != null)
             {
@@ -178,7 +178,7 @@ public class TimelineController : MonoBehaviour
                 ProjectionCam2.backgroundColor = new Color(ProjectionCam2.backgroundColor.r, ProjectionCam2.backgroundColor.g, ProjectionCam2.backgroundColor.b, newAlpha);
             }
         }
-        else if (currentTimeline == 2 || currentTimeline == 3) // projection cam1
+        else if (currentTimeline == 0 || currentTimeline == 1 || currentTimeline == 4) // projection cam1
         {
             if (ProjectionCam1 != null)
             {
