@@ -200,7 +200,7 @@ public class TimelineController : MonoBehaviour
 
         timelineIsPlaying = NumTimelinesPlaying > 0;
 
-        float prevSkinBrightnessValue = SkinBrightnessValue;
+        //float prevSkinBrightnessValue = SkinBrightnessValue;
         if (NumTimelinesPlaying <= 0)
         {
             TimerPlaystatePause += Time.deltaTime;
