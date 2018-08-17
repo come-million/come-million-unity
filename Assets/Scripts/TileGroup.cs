@@ -18,7 +18,11 @@ namespace ComeMillion
         public Material[] materials;
 
         public RenderTexture rt;
+
+        public Shader posShader;
         public RenderTexture posmap;
+        public Shader uvShader;
+        
         public RenderTexture uvmap;
         public Texture2D tex;
 
@@ -103,7 +107,7 @@ namespace ComeMillion
         {
             RenderTexture.active = uvmap;
 
-            var m = new Material(Shader.Find("Custom/UV"));
+            var m = new Material(uvShader);
             var groupProp = Shader.PropertyToID("_Group");
             var g = new Vector4(rect.x, rect.y, rect.width, rect.height);
             m.SetVector(groupProp, g);
@@ -123,7 +127,7 @@ namespace ComeMillion
         {
             RenderTexture.active = posmap;
 
-            var m = new Material(Shader.Find("Custom/Position"));
+            var m = new Material(posShader);
             var modelMatrix = Shader.PropertyToID("_ModelMatrix");
 
             foreach (var t in tiles)
