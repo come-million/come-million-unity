@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
+using System.Runtime.CompilerServices;
 
 namespace ComeMillion
 {
@@ -15,8 +16,12 @@ namespace ComeMillion
         public PlayableDirector director;
         public RectInt rect;
         public Material[] materials;
+
         public RenderTexture rt;
+        public RenderTexture posmap;
+        public RenderTexture uvmap;
         public Texture2D tex;
+
         Tile[] tiles;
 
         [NonSerialized]
@@ -29,9 +34,12 @@ namespace ComeMillion
 
         bool rendering;
 
+        ushort[] strips;
+
         void Awake()
         {
             tiles = GetComponentsInChildren<Tile>();
+            strips = tiles.Select(t => t.stripId).Distinct().ToArray();
 
             if (rect.size == Vector2Int.zero)
             {
@@ -44,9 +52,31 @@ namespace ComeMillion
                 name = this.name + "_RT",
                 filterMode = FilterMode.Point,
                 wrapMode = TextureWrapMode.Clamp,
+                useMipMap = false,
             };
             rt.Create();
             OnTextureReady.Invoke(rt);
+
+            uvmap = new RenderTexture(rect.width, rect.height, 0, RenderTextureFormat.RGFloat)
+            {
+                name = this.name + "_UV",
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp,
+                useMipMap = false,
+
+            };
+            uvmap.Create();
+
+
+            posmap = new RenderTexture(rect.width, rect.height, 0, RenderTextureFormat.ARGBFloat)
+            {
+                name = this.name + "_Pos",
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp,
+                useMipMap = false,
+            };
+            posmap.Create();
+
 
             // Array.ForEach(tiles, t => t.rt = rt);
             // tiles = GetComponentsInChildren<Tile>().Where(t => t.isActiveAndEnabled).ToArray();
@@ -69,46 +99,56 @@ namespace ComeMillion
             StartCoroutine(Run());
         }
 
-        void FillCommandBuffer(CommandBuffer cmd)
+        void RenderUV()
         {
-            cmd.Clear();
-            cmd.SetRenderTarget(rt);
-            cmd.ClearRenderTarget(true, true, Color.clear);
+            RenderTexture.active = uvmap;
 
-            var resProp = Shader.PropertyToID("_Resolution");
-            var texelSize = Shader.PropertyToID("_TexelSize");
-            var modelMatrix = Shader.PropertyToID("_ModelMatrix");
+            var m = new Material(Shader.Find("Custom/UV"));
+            var groupProp = Shader.PropertyToID("_Group");
+            var g = new Vector4(rect.x, rect.y, rect.width, rect.height);
+            m.SetVector(groupProp, g);
 
-            foreach (var m in materials)
+            foreach (var t in tiles)
             {
-                if (m == null)
-                    continue;
-                foreach (var t in tiles)
-                {
-                    var r = t.rect;
-                    var res = new Vector4(r.x, r.y, r.width, r.height);
-                    cmd.SetGlobalVector(resProp, res);
-                    cmd.SetGlobalVector(texelSize, new Vector4(rt.width, rt.height, 1f / rt.width, 1f / rt.height));
-                    cmd.SetGlobalMatrix(modelMatrix, t.transform.localToWorldMatrix);
-                    cmd.DrawMesh(t.mesh, Matrix4x4.identity, m);
-                }
+                t.material = m;
+                t.Render();
             }
 
-            // cmd.SetRenderTarget(BuiltinRenderTextureType.None);
+            RenderTexture.active = null;
+            Destroy(m);
+        }
+
+
+        void RenderPos()
+        {
+            RenderTexture.active = posmap;
+
+            var m = new Material(Shader.Find("Custom/Position"));
+            var modelMatrix = Shader.PropertyToID("_ModelMatrix");
+
+            foreach (var t in tiles)
+            {
+                t.material = m;
+                m.SetMatrix(modelMatrix, t.transform.localToWorldMatrix);
+                t.Render();
+            }
+
+            RenderTexture.active = null;
+            Destroy(m);
         }
 
         private IEnumerator Run()
         {
+            yield return null;
+            RenderUV();
+            RenderPos();
+
             // var director = GetComponent<UnityEngine.Playables.PlayableDirector>();
             var timeProp = Shader.PropertyToID("_Time");
-            var groupProp = Shader.PropertyToID("_Group");
+            // var groupProp = Shader.PropertyToID("_Group");
             yield return null;
             var w = new WaitForEndOfFrame();
 
-            // var cmd = new CommandBuffer();
-            // FillCommandBuffer(cmd);
-            // var mats = new Material[materials.Length];
-            // Array.Copy(materials, mats, materials.Length);
             var tgs = FindObjectsOfType<TileGroup>();
             var w1 = new WaitWhile(() => tgs.All(t => t.rendering));
 
@@ -121,36 +161,39 @@ namespace ComeMillion
                     Shader.SetGlobalVector(timeProp, time);
                 }
 
-                // if (!mats.SequenceEqual(materials))
-                // {
-                //     FillCommandBuffer(cmd);
-                //     mats = new Material[materials.Length];
-                //     Array.Copy(materials, mats, materials.Length);
-                // }
-                // Graphics.ExecuteCommandBuffer(cmd);
-
                 yield return w;
                 rendering = true;
 
                 RenderTexture.active = rt;
                 GL.Clear(true, true, Color.clear);
 
-                var g = new Vector4(rect.x, rect.y, rect.width, rect.height);
+                // var g = new Vector4(rect.x, rect.y, rect.width, rect.height);
+                // foreach (var m in materials)
+                // {
+                //     if (m == null)
+                //         continue;
+                //     m.SetVector(groupProp, g);
+                //     foreach (var t in tiles)
+                //     {
+                //         t.rt = rt;
+                //         t.material = m;
+                //         if (t.isActiveAndEnabled)
+                //             t.Render();
+                //     }
+                // }
+
                 foreach (var m in materials)
                 {
                     if (m == null)
                         continue;
-                    m.SetVector(groupProp, g);
-                    foreach (var t in tiles)
-                    {
-                        t.rt = rt;
-                        t.material = m;
-                        if (t.isActiveAndEnabled)
-                            t.Render();
-                    }
+                    m.SetTexture("_UVMap", uvmap);
+                    m.SetTexture("_PosMap", posmap);
+                    m.SetVector("_MainTex_Offset", new Vector4(m.mainTextureScale.x, m.mainTextureScale.y, m.mainTextureOffset.x, m.mainTextureOffset.y));
+                    Graphics.Blit(m.mainTexture, rt, m);
                 }
 
                 RenderTexture.active = null;
+
 
 
                 // #if UNITY_EDITOR
@@ -165,19 +208,19 @@ namespace ComeMillion
             }
         }
 
-        public void CopyRect(Color32[] src, Color32[] dst, RectInt r)
+        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(256)]
+        public void CopyRect(Color32[] src, Color32[] dst, RectInt r, int w)
         {
             int rows = r.height;
-            int w = rt.width;
             int rw = r.width;
-            // try
-            // {
+            int rx = r.x;
+            int ry = r.y;
+
             for (int i = 0; i < rows; i++)
             {
-                Array.Copy(src, r.x + (r.y + i) * w, dst, i * rw, rw);
+                Array.Copy(src, rx + (ry + i) * w, dst, i * rw, rw);
             }
-            // }
-            // catch (Exception) { }
         }
 
         void ReadAndSend()
@@ -190,6 +233,8 @@ namespace ComeMillion
 
             var colors = tex.GetPixels32();
 
+            int w = rt.width;
+
             for (int i = 0; i < tiles.Length; i++)
             {
                 var t = tiles[i];
@@ -197,16 +242,17 @@ namespace ComeMillion
                 {
                     RectInt r1 = t.rect;
                     var c = tilesPixels[i];
-                    CopyRect(colors, c, r1);
+                    CopyRect(colors, c, r1, w);
                     // t.tex.SetPixels32(c);
                     // t.tex.Apply();
                     client.SetData(t.stripId, (ushort)(1 + t.pixelAddressInStrip), c);
                 }
             }
 
-            var p = tex.GetPixels32(tex.mipmapCount - 1).Take(1).ToArray();
+            // var p = tex.GetPixels32(tex.mipmapCount - 1).Take(1).ToArray();
+            // last mipmap is always 1x1
+            var p = tex.GetPixels32(tex.mipmapCount - 1);
 
-            var strips = tiles.Select(t => t.stripId).Distinct();
             var tmp = p[0].r;
             p[0].r = p[0].g;
             p[0].g = tmp;

@@ -1,14 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
-public class LBClientSender : MonoBehaviour {
+public class LBClientSender : MonoBehaviour
+{
 
     public int ClientPort = 0;
     public int LBServerPort = 2000;
     public string LBServerIP = "10.0.0.215";
+
+    private readonly byte[] header = System.Array.ConvertAll(new char[] { 'L', 'e', 'd', 'B', 'u', 'r', 'n' }, System.Convert.ToByte);
 
     private const int HEADER_LENGTH = 24;
     private const byte PROTOCOL_VERSION = 0;
@@ -29,13 +33,15 @@ public class LBClientSender : MonoBehaviour {
     {
         // check if a new segment needs to be added
         uint dictKey = ((uint)stripId << 16) | (uint)pixelAddressInStrip;
-        if (!m_allSegments.ContainsKey(dictKey))
+        
+        byte[] msgByteArr;
+        if (!m_allSegments.TryGetValue(dictKey, out msgByteArr))
         {
             createNewSegment(dictKey, stripId, pixelAddressInStrip, colors.Length);
+            msgByteArr = m_allSegments[dictKey];
         }
 
         // check if the size changed
-        byte[] msgByteArr = m_allSegments[dictKey];
         int expectedLength = HEADER_LENGTH + 3 * colors.Length;
         if (msgByteArr.Length != expectedLength)
         {
@@ -45,7 +51,7 @@ public class LBClientSender : MonoBehaviour {
 
         // copy the rgb values to the internal buffer. 
         // it will be cached and sent later after all segments are updated with new frame data
-        for (int i=0; i<colors.Length; i++)
+        for (int i = 0; i < colors.Length; i++)
         {
             int pixelBufferIndex = HEADER_LENGTH + 3 * i;
             msgByteArr[pixelBufferIndex + 0] = colors[i].r;
@@ -53,17 +59,19 @@ public class LBClientSender : MonoBehaviour {
             msgByteArr[pixelBufferIndex + 2] = colors[i].b;
         }
     }
-    
-	void Start () {
-        m_lastFrameId = (uint)Random.Range(0, 10000);
+
+    void Start()
+    {
+        m_lastFrameId = (uint)UnityEngine.Random.Range(0, 10000);
         m_udpClient = new UdpClient(ClientPort);
         ClientPort = (m_udpClient.Client.LocalEndPoint as IPEndPoint).Port;
         m_targetIP = new IPEndPoint(IPAddress.Parse(LBServerIP), LBServerPort);
         m_udpClient.Connect(m_targetIP);
-	}
-	
-	void Update () {
-        if(m_udpClient == null)
+    }
+
+    void Update()
+    {
+        if (m_udpClient == null)
             return;
         m_lastFrameId++;
         foreach (byte[] segmentByteArray in m_allSegments.Values)
@@ -74,19 +82,21 @@ public class LBClientSender : MonoBehaviour {
         }
     }
 
-    private void createNewSegment(uint dictKey, ushort stripId, ushort pixelAddressInStrip, int numberOfPixels) {
+    private void createNewSegment(uint dictKey, ushort stripId, ushort pixelAddressInStrip, int numberOfPixels)
+    {
 
         m_allSegments[dictKey] = new byte[HEADER_LENGTH + 3 * numberOfPixels];
         byte[] msgByteArr = m_allSegments[dictKey];
 
         // Protocol Definition
-        msgByteArr[0] = System.Convert.ToByte('L');
-        msgByteArr[1] = System.Convert.ToByte('e');
-        msgByteArr[2] = System.Convert.ToByte('d');
-        msgByteArr[3] = System.Convert.ToByte('B');
-        msgByteArr[4] = System.Convert.ToByte('u');
-        msgByteArr[5] = System.Convert.ToByte('r');
-        msgByteArr[6] = System.Convert.ToByte('n');
+        // msgByteArr[0] = System.Convert.ToByte('L');
+        // msgByteArr[1] = System.Convert.ToByte('e');
+        // msgByteArr[2] = System.Convert.ToByte('d');
+        // msgByteArr[3] = System.Convert.ToByte('B');
+        // msgByteArr[4] = System.Convert.ToByte('u');
+        // msgByteArr[5] = System.Convert.ToByte('r');
+        // msgByteArr[6] = System.Convert.ToByte('n');
+        Buffer.BlockCopy(header, 0, msgByteArr, 0, 7);
         writeUint8ToArray(msgByteArr, 7, PROTOCOL_VERSION);
 
         // Frame definition
@@ -106,29 +116,41 @@ public class LBClientSender : MonoBehaviour {
         ushort totalNumberOfSegments = (ushort)m_allSegments.Count;
         ushort segmentsIndexForLoop = 0;
 
-        foreach (byte[] segmentByteArray in m_allSegments.Values)
+        var enumerator = m_allSegments.GetEnumerator();
+        while (enumerator.MoveNext())
         {
+            var segmentByteArray = enumerator.Current.Value;
             writeUint32ToArray(segmentByteArray, 12, totalNumberOfSegments); // total number of segments in frame
             writeUint32ToArray(segmentByteArray, 16, segmentsIndexForLoop); // current segment id
             segmentsIndexForLoop++;
         }
+
+        // foreach (byte[] segmentByteArray in m_allSegments.Values)
+        // {
+        //     writeUint32ToArray(segmentByteArray, 12, totalNumberOfSegments); // total number of segments in frame
+        //     writeUint32ToArray(segmentByteArray, 16, segmentsIndexForLoop); // current segment id
+        //     segmentsIndexForLoop++;
+        // }
     }
 
-    private void writeUint8ToArray(byte[] arr, int locInArray, byte valToWrite) {
-        arr[locInArray + 0] = (byte) valToWrite;
-    }
-
-    private void writeUint16ToArray(byte[] arr, int locInArray, ushort valToWrite)
+    private static void writeUint8ToArray(byte[] arr, int locInArray, byte valToWrite)
     {
-        arr[locInArray + 0] = (byte)((valToWrite / (1)) % 256);
-        arr[locInArray + 1] = (byte)((valToWrite / (256)) % 256);
+        arr[locInArray] = (byte)valToWrite;
     }
 
-    private void writeUint32ToArray(byte[] arr, int locInArray, uint valToWrite)
+    private static void writeUint16ToArray(byte[] arr, int locInArray, ushort valToWrite)
     {
-        arr[locInArray + 0] = (byte)((valToWrite / (1) ) % 256);
-        arr[locInArray + 1] = (byte)((valToWrite / (256) ) % 256);
-        arr[locInArray + 2] = (byte)((valToWrite / (256 * 256) ) % 256);
-        arr[locInArray + 3] = (byte)((valToWrite / (256 * 256 * 256) ) % 256);
+        arr[locInArray + 0] = (byte)((valToWrite) & 0xff);
+        arr[locInArray + 1] = (byte)((valToWrite >> 8) & 0xff);
+        // Buffer.BlockCopy(BitConverter.GetBytes(valToWrite), 0, arr, locInArray, sizeof(ushort));
+    }
+
+    private static void writeUint32ToArray(byte[] arr, int locInArray, uint valToWrite)
+    {
+        arr[locInArray + 0] = (byte)((valToWrite) & 0xff);
+        arr[locInArray + 1] = (byte)((valToWrite >> 8) & 0xff);
+        arr[locInArray + 2] = (byte)((valToWrite >> 16) & 0xff);
+        arr[locInArray + 3] = (byte)((valToWrite >> 24) & 0xff);
+        // Buffer.BlockCopy(BitConverter.GetBytes(valToWrite), 0, arr, locInArray, sizeof(uint));
     }
 }
