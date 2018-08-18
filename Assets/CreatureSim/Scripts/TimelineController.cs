@@ -8,6 +8,7 @@ public class TimelineController : MonoBehaviour
 {
     public List<PlayableDirector> playableDirectors;
     public List<TimelineAsset> timelines;
+    public List<float> timelineCamAlpha;
 
     public bool timelineIsPlaying = false;
 
@@ -23,11 +24,14 @@ public class TimelineController : MonoBehaviour
     public float SkinBrightnessValue = 0.0f;
     public float ProjCamsMaxAlpha = 0.8f;
     public float ProjCamsMinAlpha = 0.1f;
+    public float CurrentMaxCamAlpha = 0.0f;
     public float TimeToPause = 15.0f;
     public float TimeForSkinTransition = 10.0f;
     public float SkinBrightnessMin = 0.05f;
     public float SkinBrightnessMax = 0.3f;
     //public float PulseTimeScale = 1.0f;
+
+
 
     public Camera ProjectionCam1;
     public Camera ProjectionCam2;
@@ -157,10 +161,12 @@ public class TimelineController : MonoBehaviour
     private void UpdateLayersVisibility()
     {
         int currentTimeline = GetCurrentTimeline();
+        if (CurrentTimelinePlaying >= 0 && CurrentTimelinePlaying < timelineCamAlpha.Count)
+            CurrentMaxCamAlpha = timelineCamAlpha[CurrentTimelinePlaying];
 
         if (!timelineIsPlaying)//currentTimeline < 0)
         {
-            float newAlpha = Mathf.Lerp(ProjCamsMaxAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
+            float newAlpha = Mathf.Lerp(CurrentMaxCamAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
 
             float newAlpha1 = Mathf.Min(newAlpha, ProjectionCam1.backgroundColor.a);
             if (ProjectionCam1 != null)
@@ -174,7 +180,7 @@ public class TimelineController : MonoBehaviour
         {
             if (ProjectionCam2 != null)
             {
-                float newAlpha = Mathf.Lerp(ProjCamsMaxAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
+                float newAlpha = Mathf.Lerp(CurrentMaxCamAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
                 ProjectionCam2.backgroundColor = new Color(ProjectionCam2.backgroundColor.r, ProjectionCam2.backgroundColor.g, ProjectionCam2.backgroundColor.b, newAlpha);
             }
         }
@@ -182,7 +188,7 @@ public class TimelineController : MonoBehaviour
         {
             if (ProjectionCam1 != null)
             {
-                float newAlpha = Mathf.Lerp(ProjCamsMaxAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
+                float newAlpha = Mathf.Lerp(CurrentMaxCamAlpha, ProjCamsMinAlpha, SkinBrightnessValue);
                 ProjectionCam1.backgroundColor = new Color(ProjectionCam1.backgroundColor.r, ProjectionCam1.backgroundColor.g, ProjectionCam1.backgroundColor.b, newAlpha);
             }
         }
