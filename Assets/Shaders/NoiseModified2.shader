@@ -19,6 +19,7 @@
 		_TimeValue3("_TimeValue3", Float) = 0.1
 		_TimeValue4("_TimeValue4", Float) = 0.1
 		_TimeValue5("_TimeValue5", Float) = 0.00025
+		_MicLow("_MicLow", Float) = 0.5
 
 
 	}
@@ -47,6 +48,8 @@
 
 	float4 _Tint;
 	float _Alpha;
+
+	float _MicLow;
 
 	float _Gamma;
 	float _Brightness;
@@ -105,7 +108,8 @@
 		col.a *= _Alpha;
 
 		col.rgb = pow(col.rgb, _Gamma);
-		col.rgb = (col.rgb - 0.5) * _Contrast + 0.5 + _Brightness;
+		_MicLow = saturate(_MicLow - 0.4f);
+		col.rgb = (col.rgb - 0.5) * _Contrast * (1.0f - 0.3f * _MicLow) + 0.5 + _Brightness;
 		//float saturationWave = 0.5f * _Saturation * sin(10.0f * _Time.xx * 3.14 * r);
 		//float currentSaturation = fmod(_Saturation + saturationWave, 1);
 		float currentSaturation = _Saturation;
@@ -116,20 +120,23 @@
 		col.r = fmod(col.r + r, 1);
 		float brightnessWave = 0.8f + 0.5f * sin(_Time.xx * r * (uv.y * uv.x));
 		col.b = saturate(col.b * brightnessWave);
-		float cutoff = 0.1f;
-		if (col.b < cutoff)
-			col.a = 0.0;
-		else
-			col.b = (col.b - cutoff)/ (1.0f - cutoff);
+		//float cutoff = 0.1f;
+		//if (col.b < cutoff)
+		//	col.a = 0.0;
+		//else
+		//	col.b = (col.b - cutoff)/ (1.0f - cutoff);
 
 		float distX = uv.x - 0.5f;
 		float distY = uv.y - 0.5f;
 		float distFromCenter = pow(pow(distX, 2.0f) + pow(distY, 2.0f), 0.5f);
-		float timedScrollingDistFromCenter = fmod(_Time * 0.1 - distFromCenter + r, 1);
+		float timedScrollingDistFromCenter = fmod(_Time * 0.1 * (1.0f + 0.03f * _MicLow) - distFromCenter + r, 1);
 		col.r = fmod(4.0 * timedScrollingDistFromCenter + _Hue, 1);// fmod(col.r + _Time, 1);
 		col.g = fmod(0.5 + 0.5 * timedScrollingDistFromCenter * r, 1);
-		col.b = fmod(5.0f * _Brightness * timedScrollingDistFromCenter, 1);
+		col.g *= saturate(_Saturation + 3.0f * _MicLow * r);
+		col.b = fmod(5.0f * _Brightness * (1.0f - 0.3f * _MicLow) * timedScrollingDistFromCenter, 1);
 		col.b = (col.b < 0.7) ? 0.0 : col.b;
+		col.a = saturate(_Alpha  + 2.0f * _MicLow);
+		//col.b = _MicLow;
 		//col.b = 1.0;
 		//col.a = 1.0;
 		col.rgb = HSVtoRGB(col.rgb);

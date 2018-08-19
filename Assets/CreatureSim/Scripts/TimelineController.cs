@@ -20,6 +20,7 @@ public class TimelineController : MonoBehaviour
     public int CurrentTimelinePlaying = -1;
     public int NextTimelineToPlay = 0;
 
+    public Material ARSkin1;
     public Material[] SkinMats;
     public float SkinBrightnessValue = 0.0f;
     public float ProjCamsMaxAlpha = 0.8f;
@@ -30,6 +31,8 @@ public class TimelineController : MonoBehaviour
     public float SkinBrightnessMin = 0.05f;
     public float SkinBrightnessMax = 0.3f;
     //public float PulseTimeScale = 1.0f;
+
+    public DimAudioSpectrumGraph micSpectrum;
 
 
 
@@ -62,7 +65,7 @@ public class TimelineController : MonoBehaviour
         }
 
         SkinBrightnessValue = 1.0f;
-        //UpdateSkinBrightness(0.0f);
+        UpdateSkinBrightness(0.0f);
     }
 
 
@@ -142,6 +145,9 @@ public class TimelineController : MonoBehaviour
 
     public void UpdateSkinBrightness(float prevSkinBrightnessValue)
     {
+        if (ARSkin1 != null)
+            ARSkin1.SetFloat("_MicLow", micSpectrum.SpectrumValues[0]);
+
         ////if (SkinMats != null && SkinMats.Length > 0)
         ////{
         ////    SkinBrightnessValue = Mathf.Lerp(prevSkinBrightnessValue, SkinBrightnessValue, 0.1f);
@@ -206,7 +212,7 @@ public class TimelineController : MonoBehaviour
 
         timelineIsPlaying = NumTimelinesPlaying > 0;
 
-        //float prevSkinBrightnessValue = SkinBrightnessValue;
+        float prevSkinBrightnessValue = SkinBrightnessValue;
         if (NumTimelinesPlaying <= 0)
         {
             TimerPlaystatePause += Time.deltaTime;
@@ -221,7 +227,7 @@ public class TimelineController : MonoBehaviour
             TimerPlaystatePause = 0.0f;
             SkinBrightnessValue = Mathf.Clamp01(1.0f - Mathf.Clamp01(TimerPlaystatePlay / TimeForSkinTransition));
         }
-        //UpdateSkinBrightness(prevSkinBrightnessValue);        
+        UpdateSkinBrightness(prevSkinBrightnessValue);        
 
 
         if (NumTimelinesPlaying <= 0 && TimerPlaystatePause > TimeToPause && !HoldTimelinesPlayback)
