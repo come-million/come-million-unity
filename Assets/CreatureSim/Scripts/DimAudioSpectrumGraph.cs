@@ -30,7 +30,7 @@ public class DimAudioSpectrumGraph : MonoBehaviour
 	private float[] m_SpectrumRight = new float[m_SpectrumSize];    // right audio channel
                                                                     // These arrays represent normalised amplitudes of each frequency band from 0Hz to the nyquist rate
 
-    private bool MatchCrossoverValuesAmountWithSurfaceStrands = false;//true;
+    //private bool MatchCrossoverValuesAmountWithSurfaceStrands = false;//true;
 
 	private void Start()
 	{
@@ -122,7 +122,7 @@ public class DimAudioSpectrumGraph : MonoBehaviour
 
         float spectrumFreq = 0.0f;
 		int freqBand = 0;
-		float barWidth = m_HScale;
+		//float barWidth = m_HScale;
 		float maxValue = 0.0f;
 		//float accumValue = 0.0f;
 		//int accumCount = 0;
@@ -161,21 +161,20 @@ public class DimAudioSpectrumGraph : MonoBehaviour
 
                 if (DebugDraw)
                 {
-                    float centre_x = Screen.width / 2 - (m_FreqCrossover.Length / 2) * barWidth + (freqBand + 0.5f) * barWidth;
+                    ////float centre_x = Screen.width / 2 - (m_FreqCrossover.Length / 2) * barWidth + (freqBand + 0.5f) * barWidth;
 
-                    if (InvertedDebugDraw)
-                    {
-                        Vector2 bottom = new Vector2(centre_x, Screen.height - value * m_VScale);
-                        Vector2 top = new Vector2(centre_x, Screen.height);
-                        //GuiHelper.DrawLine(bottom, top, m_BarTexture, barWidth);
-                    }
-                    else
-                    {
-                        Vector2 bottom = new Vector2(centre_x, 0);
-                        Vector2 top = new Vector2(centre_x, value * m_VScale);
-                        //GuiHelper.DrawLine(bottom, top, m_BarTexture, barWidth);
-                    }
-                    
+                    ////if (InvertedDebugDraw)
+                    ////{
+                    ////    Vector2 bottom = new Vector2(centre_x, Screen.height - value * m_VScale);
+                    ////    Vector2 top = new Vector2(centre_x, Screen.height);
+                    ////    //GuiHelper.DrawLine(bottom, top, m_BarTexture, barWidth);
+                    ////}
+                    ////else
+                    ////{
+                    ////    Vector2 bottom = new Vector2(centre_x, 0);
+                    ////    Vector2 top = new Vector2(centre_x, value * m_VScale);
+                    ////    //GuiHelper.DrawLine(bottom, top, m_BarTexture, barWidth);
+                    ////}                    
                 }
 
 				// reset for next frequency band

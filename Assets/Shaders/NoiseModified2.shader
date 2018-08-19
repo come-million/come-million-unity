@@ -135,7 +135,7 @@
 		col.r = fmod(4.0 * timedScrollingDistFromCenter + _Hue, 1);// fmod(col.r + _Time, 1);
 		col.g = fmod(0.5 + 0.5 * timedScrollingDistFromCenter * r, 1);
 		col.g *= saturate(_Saturation + 3.0f * _MicLow * r);
-		col.b = fmod(5.0f * _Brightness * (1.0f - 0.3f * _MicLow) * timedScrollingDistFromCenter, 1);
+		col.b = fmod(5.0f * saturate(_Brightness + 3.0f * _MicLow) * timedScrollingDistFromCenter, 1);
 		col.b = (col.b < 0.7) ? 0.0 : col.b;
 		col.a = saturate(_Alpha  + 2.0f * _MicLow);
 		//col.b = _MicLow;
