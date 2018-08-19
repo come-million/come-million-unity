@@ -147,7 +147,12 @@ public class TimelineController : MonoBehaviour
     {
         if (ARSkin1 != null)
         {
-            Shader.SetGlobalFloat("_MicLowTest", micSpectrum.SpectrumValues[0]);
+            float sumSpectrum = 0.0f;
+            for(int i=0; i<micSpectrum.SpectrumValues.Length; i++)
+            {
+                sumSpectrum += (float)(1 + i) * micSpectrum.SpectrumValues[i];
+            }
+            Shader.SetGlobalFloat("_MicLowGlobal", sumSpectrum);
             //ARSkin1.SetFloat("_MicLow", micSpectrum.SpectrumValues[0]);
         }
 
