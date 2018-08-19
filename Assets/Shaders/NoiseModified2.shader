@@ -50,6 +50,7 @@
 	float _Alpha;
 
 	float _MicLow;
+	float _MicLowGlobal;
 
 	float _Gamma;
 	float _Brightness;
@@ -108,6 +109,7 @@
 		col.a *= _Alpha;
 
 		col.rgb = pow(col.rgb, _Gamma);
+		_MicLow = _MicLowGlobal;
 		_MicLow = saturate(_MicLow - 0.4f);
 		col.rgb = (col.rgb - 0.5) * _Contrast * (1.0f - 0.3f * _MicLow) + 0.5 + _Brightness;
 		//float saturationWave = 0.5f * _Saturation * sin(10.0f * _Time.xx * 3.14 * r);

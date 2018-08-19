@@ -146,7 +146,10 @@ public class TimelineController : MonoBehaviour
     public void UpdateSkinBrightness(float prevSkinBrightnessValue)
     {
         if (ARSkin1 != null)
-            ARSkin1.SetFloat("_MicLow", micSpectrum.SpectrumValues[0]);
+        {
+            Shader.SetGlobalFloat("_MicLowTest", micSpectrum.SpectrumValues[0]);
+            //ARSkin1.SetFloat("_MicLow", micSpectrum.SpectrumValues[0]);
+        }
 
         ////if (SkinMats != null && SkinMats.Length > 0)
         ////{
