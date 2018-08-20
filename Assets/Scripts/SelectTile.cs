@@ -58,16 +58,15 @@ public class SelectTile : MonoBehaviour
             if (tile != last)
             {
                 if (last != null)
+                {
                     last.GetComponent<MeshRenderer>().sharedMaterial = UnSelectedMaterial;
+                    SetTileColor(last, Color.black);
+                }
+
                 tile.GetComponent<MeshRenderer>().sharedMaterial = SelectedMaterial;
                 last = tile;
 
-
-                var client = tile.GetComponentInParent<TileGroup>().client;
-                var colors = new Color32[tile.rect.width * tile.rect.height];
-                for (int i = 0; i < colors.Length; i++)
-                    colors[i] = Color.red;
-                client.SetData(tile.stripId, (ushort)(1 + tile.pixelAddressInStrip), colors);
+                SetTileColor(tile, Color.red);
 
                 // FindObjectsOfType<TileGroup>().ToList().ForEach(g => Graphics.Blit(Texture2D.blackTexture, g.rt));
                 // Graphics.Blit(Texture2D.whiteTexture, tile.rt, tile.rect.size, tile.rect.position);
@@ -83,6 +82,16 @@ public class SelectTile : MonoBehaviour
             }
         }
 
+
+    }
+
+    void SetTileColor(Tile tile, Color32 color)
+    {
+        var client = tile.GetComponentInParent<TileGroup>().client;
+        var colors = new Color32[tile.rect.width * tile.rect.height];
+        for (int i = 0; i < colors.Length; i++)
+            colors[i] = color;
+        client.SetData(tile.stripId, (ushort)(1 + tile.pixelAddressInStrip), colors);
 
     }
 }
