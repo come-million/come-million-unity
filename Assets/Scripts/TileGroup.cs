@@ -22,7 +22,7 @@ namespace ComeMillion
         public Shader posShader;
         public RenderTexture posmap;
         public Shader uvShader;
-        
+
         public RenderTexture uvmap;
         public Texture2D tex;
 
@@ -158,6 +158,8 @@ namespace ComeMillion
 
             while (true)
             {
+                yield return new WaitUntil(() => isActiveAndEnabled);
+
                 if (director != null)
                 {
                     float dt = (float)director.time;
