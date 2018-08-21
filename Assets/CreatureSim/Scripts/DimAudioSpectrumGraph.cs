@@ -98,8 +98,6 @@ public class DimAudioSpectrumGraph : MonoBehaviour
 
 	private void OnGUI()
 	{
-        UnityEngine.Profiling.Profiler.BeginSample("OnGUI 1");
-
         //m_FreqCrossover[0] = m_FreqCrossoverLowestFreq;
         //for (int i = 1; i < m_FreqCrossover.Length; i++)
         //{
@@ -115,8 +113,6 @@ public class DimAudioSpectrumGraph : MonoBehaviour
         {
             m_AudioSource.GetSpectrumData(m_SpectrumLeft, 0, FFTWindow.Rectangular);
         }
-        UnityEngine.Profiling.Profiler.EndSample();
-
 
         //GuiHelper.SetOrigin(GuiHelper.Origin.BottomLeft);
 
