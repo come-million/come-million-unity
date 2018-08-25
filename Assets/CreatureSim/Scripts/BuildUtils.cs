@@ -19,17 +19,32 @@ public class BuildUtils : MonoBehaviour
     public Text TextTimePause;
     public Text TextTimelineCurrent;
     public Text TextTimeScale;
-
+    public Text TextSkinBrightness;
+    public Text TextMainBrightness;
+    public Slider SkinBrightnessSlider;
     public StringBuilder theTextBuilder;
     public TimelineController theTimelineController;
 
     public int TabState = 0;
     private int NumTabStates = 2;
 
+    public float SkinBrightnessSliderValue = 0.0f;
+    public float MainBrightnessSliderValue = 0.0f;
+
+    private float ReferenceSkinBrightness = 0.1f;
+
     void Start()
     {
         theTextBuilder = new StringBuilder("...", 20);
         SetTimeScale(1.0f);
+        SetMainBrightnessSliderValue(1.0f);
+
+        if (SkinBrightnessSlider != null)
+        {
+            ReferenceSkinBrightness = SkinBrightnessSlider.value;
+            Shader.SetGlobalFloat("_ReferenceSkinBrightness", ReferenceSkinBrightness);
+            SetSkinBrightnessSliderValue(ReferenceSkinBrightness);
+        }
     }
 
     void Update()
@@ -133,4 +148,30 @@ public class BuildUtils : MonoBehaviour
             TextTimeScale.text = theTextBuilder.ToString();
         }
     }
+
+    public void SetSkinBrightnessSliderValue(float t)
+    {
+        SkinBrightnessSliderValue = t;
+        Shader.SetGlobalFloat("_GlobalSkinBrightness", SkinBrightnessSliderValue);
+
+        if (TextSkinBrightness != null && theTextBuilder != null)
+        {
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            theTextBuilder.Append(SkinBrightnessSliderValue.ToString("F2"));
+            TextSkinBrightness.text = theTextBuilder.ToString();
+        }
+    }
+
+    public void SetMainBrightnessSliderValue(float t)
+    { 
+        MainBrightnessSliderValue = t;
+
+        if (TextMainBrightness != null && theTextBuilder != null)
+        {
+            theTextBuilder.Remove(0, theTextBuilder.Length);
+            theTextBuilder.Append(MainBrightnessSliderValue.ToString("F2"));
+            TextMainBrightness.text = theTextBuilder.ToString();
+        }
+    }
+
 }
