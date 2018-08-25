@@ -60,7 +60,7 @@
 			float _TimeValue5;
 
 			float _GlobalSkinBrightness;
-			float _MicLowGlobal;
+			//float _MicLowGlobal;
 			float _ReferenceSkinBrightness;
 
 			// struct v2f
@@ -93,7 +93,7 @@
 
 				// return float4(uv, 0, 1);
 				float r = tex2D(_MainTex, uv + _Time.x * _TimeValue1).r;
-				r = 0.5f * (r + tex2D(_MainTex, uv + _Time.xy * _TimeValue2 * (1.0f + 0.03f * _MicLowGlobal)).r);
+				r = 0.5f * (r + tex2D(_MainTex, uv + _Time.xy * _TimeValue2).r);
 				//float z = tex2D(_MainTex, r*0.25 + _Time.xy * _TimeValue2);
 				//float z = tex2D(_MainTex, uv * 2.0f + _Time.xy * _TimeValue2);
 				//float z = tex2D(_MainTex, uv * 2.0f + _TimeValue2);
@@ -119,7 +119,7 @@
 				
 				col.r = fmod(col.r + r, 1);
 				float brightnessWave = 0.5f + 0.5f * sin(_Time.x * r * uv.x * _TimeValue4) * cos(_Time.x * r * uv.y * _TimeValue4);
-				col.a *= saturate(brightnessWave * (_GlobalSkinBrightness/ _ReferenceSkinBrightness));
+				col.a *= saturate(brightnessWave * (_GlobalSkinBrightness/_ReferenceSkinBrightness));
 				col.r = fmod(col.r + _Time * 0.03, 1);
 				col.rgb = HSVtoRGB(col.rgb);
 

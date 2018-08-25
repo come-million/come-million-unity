@@ -35,6 +35,7 @@ public class BuildUtils : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 50;
         theTextBuilder = new StringBuilder("...", 20);
         SetTimeScale(1.0f);
         SetMainBrightnessSliderValue(1.0f);
